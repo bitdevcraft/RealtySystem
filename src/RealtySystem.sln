@@ -15,13 +15,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtySystem.Persistence", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtySystem.Presentation", "RealtySystem.Presentation\RealtySystem.Presentation.csproj", "{2BBEDA25-63DC-4CCB-B295-DB0DD694599A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtySystem.AppHost", "RealtySystem.AppHost\RealtySystem.AppHost.csproj", "{587A0AC5-2EE5-4B8B-8BFC-0B48CC27D12C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtySystem.ServiceDefaults", "RealtySystem.ServiceDefaults\RealtySystem.ServiceDefaults.csproj", "{9229E559-5EBE-470F-8C2A-FBD8D269612A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtySystem.MigrationService", "RealtySystem.MigrationService\RealtySystem.MigrationService.csproj", "{1E6F5FBF-82EB-47AF-A8A2-C2CE0C4A34C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{22537A0F-FF9D-4A61-96B8-BB7CAE4B7D23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -48,5 +51,20 @@ Global
 		{2BBEDA25-63DC-4CCB-B295-DB0DD694599A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BBEDA25-63DC-4CCB-B295-DB0DD694599A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BBEDA25-63DC-4CCB-B295-DB0DD694599A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{587A0AC5-2EE5-4B8B-8BFC-0B48CC27D12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{587A0AC5-2EE5-4B8B-8BFC-0B48CC27D12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{587A0AC5-2EE5-4B8B-8BFC-0B48CC27D12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{587A0AC5-2EE5-4B8B-8BFC-0B48CC27D12C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9229E559-5EBE-470F-8C2A-FBD8D269612A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9229E559-5EBE-470F-8C2A-FBD8D269612A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9229E559-5EBE-470F-8C2A-FBD8D269612A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9229E559-5EBE-470F-8C2A-FBD8D269612A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E6F5FBF-82EB-47AF-A8A2-C2CE0C4A34C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E6F5FBF-82EB-47AF-A8A2-C2CE0C4A34C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E6F5FBF-82EB-47AF-A8A2-C2CE0C4A34C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E6F5FBF-82EB-47AF-A8A2-C2CE0C4A34C2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

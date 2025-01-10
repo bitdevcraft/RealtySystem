@@ -37,7 +37,7 @@ public static class DependencyInjection
     public static IServiceCollection AddPersistenceDiServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.DatabaseService(configuration);
+        // services.DatabaseService(configuration);
         return services;
     }
 

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-RealtySystem.MigrationService-86bc5c07-abd2-49dc-b56a-682e82eac7f6</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RealtySystem.Persistence\RealtySystem.Persistence.csproj" />
+    <ProjectReference Include="..\RealtySystem.ServiceDefaults\RealtySystem.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

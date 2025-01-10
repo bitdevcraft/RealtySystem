@@ -24,7 +24,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RealtySystem.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder builder)
     {

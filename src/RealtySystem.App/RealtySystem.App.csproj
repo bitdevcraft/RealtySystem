@@ -4,11 +4,21 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>11b2d213-a4de-4a82-8b2e-dfc8325a9ab8</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="Azure.Identity" Version="1.13.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Scrutor" Version="5.1.1" />
   </ItemGroup>
 
@@ -17,6 +27,7 @@
     <ProjectReference Include="..\RealtySystem.Infrastructure\RealtySystem.Infrastructure.csproj" />
     <ProjectReference Include="..\RealtySystem.Persistence\RealtySystem.Persistence.csproj" />
     <ProjectReference Include="..\RealtySystem.Application\RealtySystem.Application.csproj" />
+    <ProjectReference Include="..\RealtySystem.ServiceDefaults\RealtySystem.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>
