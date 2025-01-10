@@ -9,7 +9,7 @@ cd src
 
 Build the Dockerfile
 ```bash
-docker build -t realty_system:latest
+docker build -t realty_system:latest .
 ```
 
 Run the Docker Container
