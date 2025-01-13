@@ -11,6 +11,7 @@
     <Folder Include="Entities\Sales\" />
     <Folder Include="Entities\Tasks\" />
     <Folder Include="Entities\Users\" />
+    <Folder Include="Shared\" />
   </ItemGroup>
 
   <ItemGroup>
