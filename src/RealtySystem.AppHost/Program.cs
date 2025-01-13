@@ -32,8 +32,15 @@ var migrations = builder.AddProject<Projects.RealtySystem_MigrationService>("mig
     .WithReference(postgresdb)
     .WaitFor(postgresdb);
 
-builder.AddProject<Projects.RealtySystem_App>("realtysystem-app")
+var realtysystem = builder.AddProject<Projects.RealtySystem_App>("realtysystem-app")
     .WithReference(postgresdb)
     .WaitForCompletion(migrations);
+
+builder.AddNpmApp("angular", "../RealtySystem.WebClientAngular")
+    .WithReference(realtysystem)
+    .WaitFor(realtysystem)
+    .WithHttpEndpoint(env: "PORT", targetPort: 4200)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerFile();
 
 builder.Build().Run();
