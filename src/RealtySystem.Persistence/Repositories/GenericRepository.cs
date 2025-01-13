@@ -20,14 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealtySystem.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
 
-namespace RealtySystem.Domain.Entities.Listings;
+using RealtySystem.Domain.Common.Repositories;
 
-public class ProjectPaymentPlan : BaseEntity
+namespace RealtySystem.Persistence.Repositories;
+
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    public string? ProjectId { get; set; }
-    public Project? Project { get; set; }
-    public string? PaymentPlanId { get; set; }
-    public PaymentPlan? PaymentPlan { get; set; }
+    private readonly AppDbContext _context;
+    private readonly DbSet<T> _dbSet;
+
+    public DbSet<T> DbSet => _dbSet;
+    public AppDbContext Context => _context;
+
+    public GenericRepository(AppDbContext context)
+    {
+        _context = context;
+        _dbSet = _context.Set<T>();
+    }
+
+    public async Task<List<T>> GetAllAsync()
+    {
+        return await _dbSet.ToListAsync();
+    }
+
+    public async Task<T?> GetByIdAsync(Guid id)
+    {
+        return await _dbSet.FindAsync(id);
+    }
+
+    public void AddAsync(T entity)
+    {
+        _dbSet.Add(entity);
+    }
+
+    public void UpdateAsync(T entity)
+    {
+        _dbSet.Update(entity);
+    }
+
+    public void DeleteAsync(T entity)
+    {
+        _dbSet.Remove(entity);
+    }
 }

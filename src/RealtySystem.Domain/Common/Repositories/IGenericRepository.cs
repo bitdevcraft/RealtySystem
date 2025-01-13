@@ -20,14 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealtySystem.Domain.Common.Primitives;
+namespace RealtySystem.Domain.Common.Repositories;
 
-namespace RealtySystem.Domain.Entities.Listings;
-
-public class ProjectPaymentPlan : BaseEntity
+public interface IGenericRepository<T> where T : class
 {
-    public string? ProjectId { get; set; }
-    public Project? Project { get; set; }
-    public string? PaymentPlanId { get; set; }
-    public PaymentPlan? PaymentPlan { get; set; }
+    Task<List<T>> GetAllAsync();
+    Task<T?> GetByIdAsync(Guid id);
+    void AddAsync(T entity);
+    void UpdateAsync(T entity);
+    void DeleteAsync(T entity);
 }
