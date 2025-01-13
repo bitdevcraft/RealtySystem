@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: migrations
+  labels:
+    app: migrations
+spec:
+  minReadySeconds: 60
+  replicas: 1
+  selector:
+    matchLabels:
+      app: migrations
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: migrations
+    spec:
+      containers:
+      - name: migrations
+        image: migrations:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: migrations-env
+        - secretRef:
+            name: migrations-secrets
+      terminationGracePeriodSeconds: 180

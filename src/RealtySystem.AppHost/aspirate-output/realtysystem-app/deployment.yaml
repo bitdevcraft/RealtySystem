@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realtysystem-app
+  labels:
+    app: realtysystem-app
+spec:
+  minReadySeconds: 60
+  replicas: 1
+  selector:
+    matchLabels:
+      app: realtysystem-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: realtysystem-app
+    spec:
+      containers:
+      - name: realtysystem-app
+        image: realtysystem-app:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        envFrom:
+        - configMapRef:
+            name: realtysystem-app-env
+        - secretRef:
+            name: realtysystem-app-secrets
+      terminationGracePeriodSeconds: 180

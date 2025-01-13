@@ -1,0 +1,38 @@
+services:
+  postgres:
+    container_name: "postgres"
+    image: "docker.io/library/postgres:17.0"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "uLruP2b3MvZwKLhyLH1aam"
+    ports:
+    - target: 5432
+      published: 5432
+    restart: unless-stopped
+  migrations:
+    container_name: "migrations"
+    image: "migrations:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ConnectionStrings__postgresdb: "Host=postgres;Port=5432;Username=postgres;Password=uLruP2b3MvZwKLhyLH1aam;Database=postgresdb"
+    restart: unless-stopped
+  realtysystem-app:
+    container_name: "realtysystem-app"
+    image: "realtysystem-app:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      ConnectionStrings__postgresdb: "Host=postgres;Port=5432;Username=postgres;Password=uLruP2b3MvZwKLhyLH1aam;Database=postgresdb"
+    ports:
+    - target: 8080
+      published: 10000
+    - target: 8443
+      published: 10001
+    restart: unless-stopped

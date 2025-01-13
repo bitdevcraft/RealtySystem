@@ -1,0 +1,10 @@
+resources:
+- postgres
+- migrations
+- realtysystem-app
+- dashboard.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+
