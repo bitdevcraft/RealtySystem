@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealtySystem.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace RealtySystem.Domain.Entities.Listings;
+using RealtySystem.Domain.Entities.Listings;
 
-public class Community : BaseEntity
+namespace RealtySystem.Persistence.Configurations.Listings;
+
+public class PaymentPlanMilestoneFeeConfiguration : IEntityTypeConfiguration<PaymentPlanMilestoneFee>
 {
-    public string? Name { get; set; }
-    public string? Description { get; set; }
-    public string? City { get; set; }
-    public string? Country { get; set; }
-
-    public ICollection<Project> Projects { get; set; } = [];
+    public void Configure(EntityTypeBuilder<PaymentPlanMilestoneFee> builder)
+    {
+        builder.ToTable("PaymentPlanMilestoneFees" , "listing");
+        builder.HasKey(ppmf => ppmf.Id);
+        builder.HasIndex(ppmf => new { ppmf.Name, ppmf.MilestoneId });
+        
+        builder.HasOne(ppmf => ppmf.Milestone)
+            .WithMany(ppm => ppm.Fees)
+            .HasForeignKey(ppmf => ppmf.MilestoneId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }

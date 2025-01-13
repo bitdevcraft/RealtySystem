@@ -37,4 +37,6 @@ public class Property : BaseEntity
 
     public string? ProjectId { get; set; }
     public Project? Project { get; set; }
+
+    public ICollection<PropertyFee> Fees { get; set; } = [];
 }

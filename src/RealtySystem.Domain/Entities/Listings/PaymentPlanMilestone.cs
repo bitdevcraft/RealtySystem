@@ -36,5 +36,8 @@ public class PaymentPlanMilestone : BaseEntity
     public Decimal PercentPerFrequency { get; set; }
     public string? OrdinalCountFromFrequency { get; set; }
 
+    public string? PaymentPlanId { get; set; }
+    public PaymentPlan? PaymentPlan { get; set; }
+
     public ICollection<PaymentPlanMilestoneFee> Fees { get; set; } = [];
 }

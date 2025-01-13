@@ -20,16 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealtySystem.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace RealtySystem.Domain.Entities.Listings;
+using RealtySystem.Domain.Entities.Listings;
 
-public class Community : BaseEntity
+namespace RealtySystem.Persistence.Configurations.Listings;
+
+public class PropertyConfiguration : IEntityTypeConfiguration<Property>
 {
-    public string? Name { get; set; }
-    public string? Description { get; set; }
-    public string? City { get; set; }
-    public string? Country { get; set; }
-
-    public ICollection<Project> Projects { get; set; } = [];
+    public void Configure(EntityTypeBuilder<Property> builder)
+    {
+        builder.ToTable("Properties", "listing");
+        builder.HasKey(x => x.Id);
+        builder.HasIndex(x => x.Name);
+        
+        builder.HasOne(x => x.Project)
+            .WithMany(x => x.Properties)
+            .HasForeignKey(x => x.ProjectId);
+    }
 }

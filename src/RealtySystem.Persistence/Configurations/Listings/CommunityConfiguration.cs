@@ -31,7 +31,8 @@ public class CommunityConfiguration : IEntityTypeConfiguration<Community>
 {
     public void Configure(EntityTypeBuilder<Community> builder)
     {
-        builder.ToTable("Community", "listing");
+        builder.ToTable("Communities", "listing");
         builder.HasKey(c => c.Id);
+        builder.HasIndex(c => c.Name);
     }
 }
