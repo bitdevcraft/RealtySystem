@@ -36,3 +36,14 @@ services:
     - target: 8443
       published: 10001
     restart: unless-stopped
+  angular:
+    container_name: "angular"
+    image: "angular:latest"
+    environment:
+      NODE_ENV: "development"
+      services__realtysystem-app__http__0: "http://realtysystem-app:8080"
+      PORT: "80"
+    ports:
+    - target: 80
+      published: 4200
+    restart: unless-stopped

@@ -58,6 +58,26 @@
         }
       }
     },
+    "angular": {
+      "type": "dockerfile.v0",
+      "path": "../RealtySystem.WebClientAngular/Dockerfile",
+      "context": "../RealtySystem.WebClientAngular",
+      "env": {
+        "NODE_ENV": "development",
+        "services__realtysystem-app__http__0": "{realtysystem-app.bindings.http.url}",
+        "services__realtysystem-app__https__0": "{realtysystem-app.bindings.https.url}",
+        "PORT": "{angular.bindings.http.targetPort}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "targetPort": 80,
+          "external": true
+        }
+      }
+    },
     "postgres-password": {
       "type": "parameter.v0",
       "value": "{postgres-password.inputs.value}",

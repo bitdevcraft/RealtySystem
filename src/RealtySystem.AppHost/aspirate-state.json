@@ -26,7 +26,8 @@
       },
       "realtysystem-app": {
         "ConnectionStrings__postgresdb": "BzYCy41u8J9dGRAb\u002B\u002BdVvzQDNFUqBt/bHIiOq8aR7UiZQGMcC/nkwxY8MVXrM1/narU1Wsd44DiisKOkzx295bi6FTUkxOWJzd0RPAJro1i1BDSSdVkBb7JDOrSAUBIzbMbIcwRR\u002BJKHFSR\u002Bgx7GEKZBeXD0VjLf5A=="
-      }
+      },
+      "angular": {}
     }
   },
   "processAllComponents": true

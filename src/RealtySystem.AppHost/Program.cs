@@ -39,7 +39,7 @@ var realtysystem = builder.AddProject<Projects.RealtySystem_App>("realtysystem-a
 builder.AddNpmApp("angular", "../RealtySystem.WebClientAngular")
     .WithReference(realtysystem)
     .WaitFor(realtysystem)
-    .WithHttpEndpoint(env: "PORT", targetPort: 4200)
+    .WithHttpEndpoint(env: "PORT", targetPort: 80)
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile();
 
