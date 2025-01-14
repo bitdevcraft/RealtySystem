@@ -1,23 +1,23 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { InputTextModule } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { SelectModule } from 'primeng/select';
-import { SliderModule } from 'primeng/slider';
-import { Table, TableModule } from 'primeng/table';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { ToggleButtonModule } from 'primeng/togglebutton';
-import { ToastModule } from 'primeng/toast';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { RatingModule } from 'primeng/rating';
-import { RippleModule } from 'primeng/ripple';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { TagModule } from 'primeng/tag';
-import { Customer, CustomerService, Representative } from '../service/customer.service';
-import { Product, ProductService } from '../service/product.service';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {InputTextModule} from 'primeng/inputtext';
+import {MultiSelectModule} from 'primeng/multiselect';
+import {SelectModule} from 'primeng/select';
+import {SliderModule} from 'primeng/slider';
+import {Table, TableModule} from 'primeng/table';
+import {ProgressBarModule} from 'primeng/progressbar';
+import {ToggleButtonModule} from 'primeng/togglebutton';
+import {ToastModule} from 'primeng/toast';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ButtonModule} from 'primeng/button';
+import {RatingModule} from 'primeng/rating';
+import {RippleModule} from 'primeng/ripple';
+import {InputIconModule} from 'primeng/inputicon';
+import {IconFieldModule} from 'primeng/iconfield';
+import {TagModule} from 'primeng/tag';
+import {Customer, CustomerService, Representative} from '../service/customer.service';
+import {Product, ProductService} from '../service/product.service';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -44,7 +44,8 @@ interface expandedRows {
         RippleModule,
         IconFieldModule
     ],
-    template: ` <div class="card">
+    template: `
+        <div class="card">
             <div class="font-semibold text-xl mb-4">Filtering</div>
             <p-table
                 #dt1
@@ -57,15 +58,18 @@ interface expandedRows {
                 [paginator]="true"
                 [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
                 responsiveLayout="scroll"
+
             >
                 <ng-template #caption>
                     <div class="flex justify-between items-center flex-column sm:flex-row">
-                        <button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
+                        <button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash"
+                                (click)="clear(dt1)"></button>
                         <p-iconfield iconPosition="left" class="ml-auto">
                             <p-inputicon>
                                 <i class="pi pi-search"></i>
                             </p-inputicon>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt1, $event)" placeholder="Search keyword" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt1, $event)"
+                                   placeholder="Search keyword"/>
                         </p-iconfield>
                     </div>
                 </ng-template>
@@ -74,29 +78,36 @@ interface expandedRows {
                         <th style="min-width: 12rem">
                             <div class="flex justify-between items-center">
                                 Name
-                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
+                                <p-columnFilter type="text" field="name" display="menu"
+                                                placeholder="Search by name"></p-columnFilter>
                             </div>
                         </th>
                         <th style="min-width: 12rem">
                             <div class="flex justify-between items-center">
                                 Country
-                                <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter>
+                                <p-columnFilter type="text" field="country.name" display="menu"
+                                                placeholder="Search by country"></p-columnFilter>
                             </div>
                         </th>
                         <th style="min-width: 14rem">
                             <div class="flex justify-between items-center">
                                 Agent
-                                <p-columnFilter field="representative" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <p-columnFilter field="representative" matchMode="in" display="menu"
+                                                [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                                     <ng-template #header>
                                         <div class="px-3 pt-3 pb-0">
                                             <span class="font-bold">Agent Picker</span>
                                         </div>
                                     </ng-template>
                                     <ng-template #filter let-value let-filter="filterCallback">
-                                        <p-multiselect [ngModel]="value" [options]="representatives" placeholder="Any" (onChange)="filter($event.value)" optionLabel="name" styleClass="w-full">
+                                        <p-multiselect [ngModel]="value" [options]="representatives" placeholder="Any"
+                                                       (onChange)="filter($event.value)" optionLabel="name"
+                                                       styleClass="w-full">
                                             <ng-template let-option #item>
                                                 <div class="flex items-center gap-2 w-44">
-                                                    <img [alt]="option.label" src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ option.image }}" width="32" />
+                                                    <img [alt]="option.label"
+                                                         src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ option.image }}"
+                                                         width="32"/>
                                                     <span>{{ option.name }}</span>
                                                 </div>
                                             </ng-template>
@@ -108,13 +119,15 @@ interface expandedRows {
                         <th style="min-width: 10rem">
                             <div class="flex justify-between items-center">
                                 Date
-                                <p-columnFilter type="date" field="date" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                                <p-columnFilter type="date" field="date" display="menu"
+                                                placeholder="mm/dd/yyyy"></p-columnFilter>
                             </div>
                         </th>
                         <th style="min-width: 10rem">
                             <div class="flex justify-between items-center">
                                 Balance
-                                <p-columnFilter type="numeric" field="balance" display="menu" currency="USD"></p-columnFilter>
+                                <p-columnFilter type="numeric" field="balance" display="menu"
+                                                currency="USD"></p-columnFilter>
                             </div>
                         </th>
                         <th style="min-width: 12rem">
@@ -122,9 +135,12 @@ interface expandedRows {
                                 Status
                                 <p-columnFilter field="status" matchMode="equals" display="menu">
                                     <ng-template #filter let-value let-filter="filterCallback">
-                                        <p-select [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)" placeholder="Any" [style]="{ 'min-width': '12rem' }">
+                                        <p-select [ngModel]="value" [options]="statuses"
+                                                  (onChange)="filter($event.value)" placeholder="Any"
+                                                  [style]="{ 'min-width': '12rem' }">
                                             <ng-template let-option #item>
-                                                <span [class]="'customer-badge status-' + option.value">{{ option.label }}</span>
+                                                <span
+                                                    [class]="'customer-badge status-' + option.value">{{ option.label }}</span>
                                             </ng-template>
                                         </p-select>
                                     </ng-template>
@@ -134,9 +150,12 @@ interface expandedRows {
                         <th style="min-width: 12rem">
                             <div class="flex justify-between items-center">
                                 Activity
-                                <p-columnFilter field="activity" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                <p-columnFilter field="activity" matchMode="between" display="menu"
+                                                [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
                                     <ng-template #filter let-filter="filterCallback">
-                                        <p-slider [ngModel]="activityValues" [range]="true" (onSlideEnd)="filter($event.values)" styleClass="m-3" [style]="{ 'min-width': '12rem' }"></p-slider>
+                                        <p-slider [ngModel]="activityValues" [range]="true"
+                                                  (onSlideEnd)="filter($event.values)" styleClass="m-3"
+                                                  [style]="{ 'min-width': '12rem' }"></p-slider>
                                         <div class="flex items-center justify-between px-2">
                                             <span>{{ activityValues[0] }}</span>
                                             <span>{{ activityValues[1] }}</span>
@@ -160,13 +179,16 @@ interface expandedRows {
                         </td>
                         <td>
                             <div class="flex items-center gap-2">
-                                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png" [class]="'flag flag-' + customer.country.code" width="30" />
+                                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png"
+                                     [class]="'flag flag-' + customer.country.code" width="30"/>
                                 <span>{{ customer.country.name }}</span>
                             </div>
                         </td>
                         <td>
                             <div class="flex items-center gap-2">
-                                <img [alt]="customer.representative.name" src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}" width="32" style="vertical-align: middle" />
+                                <img [alt]="customer.representative.name"
+                                     src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}"
+                                     width="32" style="vertical-align: middle"/>
                                 <span class="image-text">{{ customer.representative.name }}</span>
                             </div>
                         </td>
@@ -177,13 +199,18 @@ interface expandedRows {
                             {{ customer.balance | currency: 'USD' : 'symbol' }}
                         </td>
                         <td>
-                            <p-tag [value]="customer.status.toLowerCase()" [severity]="getSeverity(customer.status.toLowerCase())" styleClass="dark:!bg-surface-900" />
+                            <p-tag [value]="customer.status.toLowerCase()"
+                                   [severity]="getSeverity(customer.status.toLowerCase())"
+                                   styleClass="dark:!bg-surface-900"/>
                         </td>
                         <td>
-                            <p-progressbar [value]="customer.activity" [showValue]="false" [style]="{ height: '0.5rem' }" />
+                            <p-progressbar [value]="customer.activity" [showValue]="false"
+                                           [style]="{ height: '0.5rem' }"/>
                         </td>
                         <td class="text-center">
-                            <p-tag [value]="customer.status.toLowerCase()" [severity]="getSeverity(customer.status.toLowerCase())" styleClass="dark:!bg-surface-900" />
+                            <p-tag [value]="customer.status.toLowerCase()"
+                                   [severity]="getSeverity(customer.status.toLowerCase())"
+                                   styleClass="dark:!bg-surface-900"/>
                         </td>
                     </tr>
                 </ng-template>
@@ -202,7 +229,8 @@ interface expandedRows {
 
         <div class="card">
             <div class="font-semibold text-xl mb-4">Frozen Columns</div>
-            <p-togglebutton [(ngModel)]="balanceFrozen" [onIcon]="'pi pi-lock'" offIcon="pi pi-lock-open" [onLabel]="'Balance'" offLabel="Balance" />
+            <p-togglebutton [(ngModel)]="balanceFrozen" [onIcon]="'pi pi-lock'" offIcon="pi pi-lock-open"
+                            [onLabel]="'Balance'" offLabel="Balance"/>
 
             <p-table [value]="customers2" [scrollable]="true" scrollHeight="400px" styleClass="mt-4">
                 <ng-template #header>
@@ -215,7 +243,9 @@ interface expandedRows {
                         <th style="min-width:200px">Status</th>
                         <th style="min-width:200px">Activity</th>
                         <th style="min-width:200px">Representative</th>
-                        <th style="min-width:200px" alignFrozen="right" pFrozenColumn [frozen]="balanceFrozen" [ngClass]="{ 'font-bold': balanceFrozen }">Balance</th>
+                        <th style="min-width:200px" alignFrozen="right" pFrozenColumn [frozen]="balanceFrozen"
+                            [ngClass]="{ 'font-bold': balanceFrozen }">Balance
+                        </th>
                     </tr>
                 </ng-template>
                 <ng-template #body let-customer>
@@ -228,7 +258,8 @@ interface expandedRows {
                         <td>{{ customer.status }}</td>
                         <td>{{ customer.activity }}</td>
                         <td>{{ customer.representative.name }}</td>
-                        <td alignFrozen="right" pFrozenColumn [frozen]="balanceFrozen" [ngClass]="{ 'font-bold': balanceFrozen }">
+                        <td alignFrozen="right" pFrozenColumn [frozen]="balanceFrozen"
+                            [ngClass]="{ 'font-bold': balanceFrozen }">
                             {{ formatCurrency(customer.balance) }}
                         </td>
                     </tr>
@@ -240,7 +271,8 @@ interface expandedRows {
             <div class="font-semibold text-xl mb-4">Row Expansion</div>
             <p-table [value]="products" dataKey="name" [expandedRowKeys]="expandedRows" responsiveLayout="scroll">
                 <ng-template #caption>
-                    <button pButton icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}" label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}" (click)="expandAll()"></button>
+                    <button pButton icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"
+                            label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}" (click)="expandAll()"></button>
                     <div class="flex table-header"></div>
                 </ng-template>
                 <ng-template #header>
@@ -272,17 +304,21 @@ interface expandedRows {
                 <ng-template #body let-product let-expanded="expanded">
                     <tr>
                         <td>
-                            <button type="button" pButton pRipple [pRowToggler]="product" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                            <button type="button" pButton pRipple [pRowToggler]="product"
+                                    class="p-button-text p-button-rounded p-button-plain"
+                                    [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                         </td>
                         <td style="min-width: 12rem;">{{ product.name }}</td>
-                        <td><img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image" [alt]="product.name" width="50" class="shadow-lg" /></td>
+                        <td><img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image"
+                                 [alt]="product.name" width="50" class="shadow-lg"/></td>
                         <td style="min-width: 8rem;">{{ product.price | currency: 'USD' }}</td>
                         <td style="min-width: 10rem;">{{ product.category }}</td>
                         <td style="min-width: 10rem;">
                             <p-rating [ngModel]="product.rating" [readonly]="true"></p-rating>
                         </td>
                         <td>
-                            <p-tag [value]="product.inventoryStatus.toLowerCase()" [severity]="getSeverity(product.inventoryStatus)" styleClass="dark:!bg-surface-900" />
+                            <p-tag [value]="product.inventoryStatus.toLowerCase()"
+                                   [severity]="getSeverity(product.inventoryStatus)" styleClass="dark:!bg-surface-900"/>
                         </td>
                     </tr>
                 </ng-template>
@@ -323,7 +359,8 @@ interface expandedRows {
                                             <td>{{ order.date }}</td>
                                             <td>{{ order.amount | currency: 'USD' }}</td>
                                             <td>
-                                                <span [class]="'order-badge order-' + order.status.toLowerCase()">{{ order.status }}</span>
+                                                <span
+                                                    [class]="'order-badge order-' + order.status.toLowerCase()">{{ order.status }}</span>
                                             </td>
                                             <td>
                                                 <p-button type="button" icon="pi pi-search"></p-button>
@@ -345,7 +382,9 @@ interface expandedRows {
 
         <div class="card">
             <div class="font-semibold text-xl mb-4">Grouping</div>
-            <p-table [value]="customers3" sortField="representative.name" sortMode="single" [scrollable]="true" scrollHeight="400px" rowGroupMode="subheader" groupRowsBy="representative.name" [tableStyle]="{ 'min-width': '60rem' }">
+            <p-table [value]="customers3" sortField="representative.name" sortMode="single" [scrollable]="true"
+                     scrollHeight="400px" rowGroupMode="subheader" groupRowsBy="representative.name"
+                     [tableStyle]="{ 'min-width': '60rem' }">
                 <ng-template #header>
                     <tr>
                         <th>Name</th>
@@ -359,7 +398,9 @@ interface expandedRows {
                     <tr pRowGroupHeader>
                         <td colspan="5">
                             <div class="flex items-center gap-2">
-                                <img [alt]="customer.representative.name" src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}" width="32" style="vertical-align: middle" />
+                                <img [alt]="customer.representative.name"
+                                     src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{ customer.representative.image }}"
+                                     width="32" style="vertical-align: middle"/>
                                 <span class="font-bold">{{ customer.representative.name }}</span>
                             </div>
                         </td>
@@ -367,7 +408,9 @@ interface expandedRows {
                 </ng-template>
                 <ng-template #groupfooter let-customer>
                     <tr>
-                        <td colspan="5" class="text-right font-bold pr-12">Total Customers: {{ calculateCustomerTotal(customer.representative.name) }}</td>
+                        <td colspan="5" class="text-right font-bold pr-12">Total
+                            Customers: {{ calculateCustomerTotal(customer.representative.name) }}
+                        </td>
                     </tr>
                 </ng-template>
                 <ng-template #body let-customer let-rowIndex="rowIndex">
@@ -377,7 +420,8 @@ interface expandedRows {
                         </td>
                         <td>
                             <div class="flex items-center gap-2">
-                                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png" [class]="'flag flag-' + customer.country.code" style="width: 20px" />
+                                <img src="https://primefaces.org/cdn/primeng/images/demo/flag/flag_placeholder.png"
+                                     [class]="'flag flag-' + customer.country.code" style="width: 20px"/>
                                 <span>{{ customer.country.name }}</span>
                             </div>
                         </td>
@@ -385,7 +429,7 @@ interface expandedRows {
                             {{ customer.company }}
                         </td>
                         <td>
-                            <p-tag [value]="customer.status" [severity]="getSeverity(customer.status)" />
+                            <p-tag [value]="customer.status" [severity]="getSeverity(customer.status)"/>
                         </td>
                         <td>
                             {{ customer.date }}
@@ -439,7 +483,8 @@ export class TableDemo implements OnInit {
     constructor(
         private customerService: CustomerService,
         private productService: ProductService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         this.customerService.getCustomersLarge().then((customers) => {
@@ -454,25 +499,25 @@ export class TableDemo implements OnInit {
         this.productService.getProductsWithOrdersSmall().then((data) => (this.products = data));
 
         this.representatives = [
-            { name: 'Amy Elsner', image: 'amyelsner.png' },
-            { name: 'Anna Fali', image: 'annafali.png' },
-            { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-            { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-            { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-            { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-            { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-            { name: 'Onyama Limba', image: 'onyamalimba.png' },
-            { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-            { name: 'XuXue Feng', image: 'xuxuefeng.png' }
+            {name: 'Amy Elsner', image: 'amyelsner.png'},
+            {name: 'Anna Fali', image: 'annafali.png'},
+            {name: 'Asiya Javayant', image: 'asiyajavayant.png'},
+            {name: 'Bernardo Dominic', image: 'bernardodominic.png'},
+            {name: 'Elwin Sharvill', image: 'elwinsharvill.png'},
+            {name: 'Ioni Bowcher', image: 'ionibowcher.png'},
+            {name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png'},
+            {name: 'Onyama Limba', image: 'onyamalimba.png'},
+            {name: 'Stephen Shaw', image: 'stephenshaw.png'},
+            {name: 'XuXue Feng', image: 'xuxuefeng.png'}
         ];
 
         this.statuses = [
-            { label: 'Unqualified', value: 'unqualified' },
-            { label: 'Qualified', value: 'qualified' },
-            { label: 'New', value: 'new' },
-            { label: 'Negotiation', value: 'negotiation' },
-            { label: 'Renewal', value: 'renewal' },
-            { label: 'Proposal', value: 'proposal' }
+            {label: 'Unqualified', value: 'unqualified'},
+            {label: 'Qualified', value: 'qualified'},
+            {label: 'New', value: 'new'},
+            {label: 'Negotiation', value: 'negotiation'},
+            {label: 'Renewal', value: 'renewal'},
+            {label: 'Proposal', value: 'proposal'}
         ];
     }
 
@@ -489,14 +534,14 @@ export class TableDemo implements OnInit {
                 const representativeName = rowData?.representative?.name || '';
 
                 if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = { index: 0, size: 1 };
+                    this.rowGroupMetadata[representativeName] = {index: 0, size: 1};
                 } else {
                     const previousRowData = this.customers3[i - 1];
                     const previousRowGroup = previousRowData?.representative?.name;
                     if (representativeName === previousRowGroup) {
                         this.rowGroupMetadata[representativeName].size++;
                     } else {
-                        this.rowGroupMetadata[representativeName] = { index: i, size: 1 };
+                        this.rowGroupMetadata[representativeName] = {index: i, size: 1};
                     }
                 }
             }
@@ -513,7 +558,7 @@ export class TableDemo implements OnInit {
     }
 
     formatCurrency(value: number) {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
     }
 
     onGlobalFilter(table: Table, event: Event) {
