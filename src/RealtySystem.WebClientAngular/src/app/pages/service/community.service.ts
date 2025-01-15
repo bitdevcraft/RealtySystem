@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {Project} from "./project.service";
 
 export interface Community {
     id?: string | null;
@@ -6,6 +7,7 @@ export interface Community {
     description?: string | null;
     city?: string | null;
     country?: string | null;
+    project?: Project[];
 }
 
 @Injectable({
@@ -1437,7 +1439,14 @@ export class CommunityService {
         return Promise.resolve(this.getData().slice(0, 200));
     }
 
+
     getCommunitiesXLarge() {
         return Promise.resolve(this.getData());
+    }
+
+
+    getCommunitiesByName(name: string) {
+        return Promise.resolve(this.getData()
+            .filter((c) => c.name.toLowerCase().indexOf(name.toLowerCase()) > -1));
     }
 }

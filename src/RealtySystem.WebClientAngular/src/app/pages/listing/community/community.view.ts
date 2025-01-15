@@ -1,17 +1,15 @@
-import {Component, ElementRef, signal, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, ViewChild} from '@angular/core';
 import {ButtonModule} from "primeng/button";
 import {ToolbarModule} from "primeng/toolbar";
-import {ButtonGroupModule} from "primeng/buttongroup";
 import {Table, TableModule} from "primeng/table";
 import {CommonModule} from "@angular/common";
 import {IconFieldModule} from "primeng/iconfield";
 import {InputIconModule} from "primeng/inputicon";
-import {InputText, InputTextModule} from "primeng/inputtext";
+import {InputTextModule} from "primeng/inputtext";
 import {DialogModule} from "primeng/dialog";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
 import {Community, CommunityService} from "../../service/community.service";
-import {Textarea, TextareaModule} from "primeng/textarea";
-import {Product, ProductService} from "../../service/product.service";
+import {TextareaModule} from "primeng/textarea";
 import {RippleModule} from "primeng/ripple";
 import {ToastModule} from "primeng/toast";
 import {RatingModule} from "primeng/rating";
@@ -21,6 +19,8 @@ import {InputNumberModule} from "primeng/inputnumber";
 import {TagModule} from "primeng/tag";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
+import {CountryService} from "../../service/country.service";
+import {Country} from "../../service/customer.service";
 
 
 interface Column {
@@ -54,7 +54,7 @@ interface ExportColumn {
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -66,7 +66,7 @@ interface ExportColumn {
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"/>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true"/>
             </ng-template>
         </p-toolbar>
 
@@ -109,8 +109,7 @@ interface ExportColumn {
                         <p-columnFilter type="text" field="name" display="menu"
                                         placeholder="Search by name"></p-columnFilter>
                     </th>
-                    <th>Image</th>
-                    <th  style="min-width: 8rem">
+                    <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
                             Description
                             <p-columnFilter type="text" field="description" display="menu"
@@ -147,20 +146,30 @@ interface ExportColumn {
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="recordDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
+        <p-dialog [(visible)]="recordDialog" [style]="{ width: '450px' }" header="Community Details" [modal]="true">
             <ng-template #content>
                 <div class="flex flex-col gap-6">
-
                     <div>
                         <label for="name" class="block font-bold mb-3">Name</label>
                         <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid/>
                         <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
                     </div>
                     <div>
+                        <label for="country" class="block font-bold mb-3">Country</label>
+                        <p-select [(ngModel)]="record.country" inputId="country" [options]="countryList"
+                                  [filter]="true" filterBy="name" [showClear]="true"
+                                  optionLabel="name" optionValue="name" placeholder="Select a Country" fluid/>
+                    </div>
+                    <div>
+                        <label for="city" class="block font-bold mb-3">City</label>
+                        <input type="text" pInputText id="city" [(ngModel)]="record.city" autofocus fluid/>
+                    </div>
+                    <div>
                         <label for="description" class="block font-bold mb-3">Description</label>
                         <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3"
                                   cols="20" fluid></textarea>
                     </div>
+
 
                 </div>
             </ng-template>
@@ -173,7 +182,7 @@ interface ExportColumn {
 
         <p-confirmdialog [style]="{ width: '450px' }"/>
     `,
-    providers: [MessageService, ProductService, ConfirmationService, CommunityService]
+    providers: [MessageService, ConfirmationService, CommunityService, CountryService]
 })
 export class CommunityView {
     recordDialog: boolean = false;
@@ -186,8 +195,6 @@ export class CommunityView {
 
     submitted: boolean = false;
 
-    statuses!: any[];
-
     @ViewChild('dt') dt!: Table;
 
     exportColumns!: ExportColumn[];
@@ -196,8 +203,13 @@ export class CommunityView {
 
     @ViewChild('filter') filter!: ElementRef;
 
+    countryService = inject(CountryService);
+
+    countryList: Country[] | undefined
+
+    cityList: { label: string; value: string }[] | undefined;
+
     constructor(
-        private productService: ProductService,
         private communityService: CommunityService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
@@ -210,18 +222,16 @@ export class CommunityView {
 
     ngOnInit() {
         this.loadDemoData();
+
+        this.countryService.getCountries().then((countries) => {
+            this.countryList = countries;
+        });
     }
 
     loadDemoData() {
         this.communityService.getCommunitiesLarge().then((data) => {
             this.records.set(data);
         });
-
-        this.statuses = [
-            {label: 'INSTOCK', value: 'instock'},
-            {label: 'LOWSTOCK', value: 'lowstock'},
-            {label: 'OUTOFSTOCK', value: 'outofstock'}
-        ];
 
         this.cols = [
             {field: 'code', header: 'Code', customExportHeader: 'Product Code'},
@@ -244,7 +254,7 @@ export class CommunityView {
         this.recordDialog = true;
     }
 
-    editRecord(record: Product) {
+    editRecord(record: Community) {
         this.record = {...record};
         this.recordDialog = true;
     }
@@ -272,7 +282,7 @@ export class CommunityView {
         this.submitted = false;
     }
 
-    deleteRecord(record: Product) {
+    deleteRecord(record: Community) {
         this.confirmationService.confirm({
             message: 'Are you sure you want to delete ' + record.name + '?',
             header: 'Confirm',
@@ -304,24 +314,11 @@ export class CommunityView {
 
     createId(): string {
         let id = '';
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (var i = 0; i < 5; i++) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        for (let i = 0; i < 5; i++) {
             id += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return id;
-    }
-
-    getSeverity(status: string) {
-        switch (status) {
-            case 'INSTOCK':
-                return 'success';
-            case 'LOWSTOCK':
-                return 'warn';
-            case 'OUTOFSTOCK':
-                return 'danger';
-            default:
-                return 'info';
-        }
     }
 
     saveRecord() {
