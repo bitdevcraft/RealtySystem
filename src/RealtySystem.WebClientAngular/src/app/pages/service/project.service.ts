@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Community} from "./community.service";
+import {Property} from "./property.service";
 
 
 export interface Project {
@@ -8,6 +9,7 @@ export interface Project {
     description?: string | null;
     communityId?: string | null;
     community?: Community | null;
+    properties?: Property[];
 }
 
 @Injectable({

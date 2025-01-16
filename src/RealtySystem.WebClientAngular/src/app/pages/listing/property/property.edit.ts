@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FieldsetModule} from "primeng/fieldset";
 import {AccordionModule} from "primeng/accordion";
 import {Button, ButtonDirective, ButtonIcon, ButtonLabel} from "primeng/button";
@@ -12,6 +12,16 @@ import {Select} from "primeng/select";
 import {Textarea} from "primeng/textarea";
 import {FormsModule} from "@angular/forms";
 import {Fluid, FluidModule} from "primeng/fluid";
+import {CountryService} from "../../service/country.service";
+import {Country} from "../../service/customer.service";
+import {MenuItem} from "primeng/api";
+import {SplitButton, SplitButtonModule} from "primeng/splitbutton";
+import {AutoComplete, AutoCompleteCompleteEvent} from "primeng/autocomplete";
+import {ProjectService} from "../../service/project.service";
+import {Feature} from "../../service/property.service";
+import {TableModule} from "primeng/table";
+import {PanelModule} from "primeng/panel";
+import {InputNumberModule} from "primeng/inputnumber";
 
 @Component({
     selector: 'property-edit',
@@ -26,7 +36,12 @@ import {Fluid, FluidModule} from "primeng/fluid";
         Select,
         Textarea,
         FormsModule,
-        FluidModule
+        FluidModule,
+        AutoComplete,
+        TableModule,
+        SplitButtonModule,
+        PanelModule,
+        InputNumberModule
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -44,16 +59,18 @@ import {Fluid, FluidModule} from "primeng/fluid";
             <ng-template #end>
                 <div>
                     <p-buttongroup>
-                        <p-button label="Edit" severity="secondary" variant="outlined" icon="pi pi-pencil"/>
-                        <p-button label="Quick Action" severity="secondary" variant="outlined"/>
-                        <p-button label="Preview" severity="secondary" variant="outlined"/>
+                        <!--                        <p-button label="Save" variant="outlined" icon="pi pi-pencil"/>-->
+                        <!--                        <p-button label="Cancel" severity="danger" variant="outlined" icon="pi pi-times"/>-->
+                        <!--                        <p-button label="Edit" severity="secondary" variant="outlined" icon="pi pi-pencil"/>-->
+                        <!--                        <p-button label="Quick Action" severity="secondary" variant="outlined"/>-->
+                        <!--                        <p-button label="Preview" severity="secondary" variant="outlined"/>-->
                     </p-buttongroup>
 
                 </div>
             </ng-template>
         </p-toolbar>
 
-        <div class="">
+        <div class="mb-6">
             <p-tabs value="0" scrollable>
                 <p-tablist>
                     <p-tab value="0">Details</p-tab>
@@ -62,119 +79,197 @@ import {Fluid, FluidModule} from "primeng/fluid";
                 </p-tablist>
                 <p-tabpanels>
                     <p-tabpanel value="0">
-                        <p-accordion [value]="['0', '1', '2','3']" [multiple]="true">
-                            <p-accordion-panel value="0" >
-                                <p-accordion-header>Property Details</p-accordion-header>
-                                <p-accordion-content>
-                                    <p-fluid>
-                                        <div class="mb-4">
-                                            <div class=" flex flex-col gap-6 w-full">
-                                                <div class="flex flex-col md:flex-row gap-6">
+                        <div class="mb-6">
+                            <p-fieldset legend="Property Details" [toggleable]="true">
+                                <p-fluid>
+                                    <div class="mb-4">
+                                        <div class=" flex flex-col gap-6 w-full">
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="name">Name</label>
+                                                    <input pInputText id="name" type="text"/>
+                                                </div>
+                                                <div class="flex flex-wrap flex-col gap-2 w-full">
+                                                    <label for="project">Project</label>
+                                                    <p-autocomplete inputId="project" [(ngModel)]="project"
+                                                                    [suggestions]="autoFilteredValue"
+                                                                    optionLabel="name" placeholder="Search"
+                                                                    (completeMethod)="filterProjects($event)"
+                                                    ></p-autocomplete>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap">
+                                                <label for="description">Description</label>
+                                                <textarea pTextarea id="description" rows="4"></textarea>
+                                            </div>
+
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="type">Property Type</label>
+                                                    <p-select id="type" [(ngModel)]="propertyType"
+                                                              [options]="propertyTypes" optionLabel="name"
+                                                              placeholder="Select Type" class="w-full"
+                                                              appendTo="body"
+                                                    ></p-select>
+                                                </div>
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="listingType">Listing Type</label>
+                                                    <p-select id="listingType" [(ngModel)]="listingType"
+                                                              [options]="listingTypes" optionLabel="name"
+                                                              placeholder="Select Listing Type" class="w-full"
+                                                              appendTo="body"
+                                                    ></p-select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-fluid>
+                            </p-fieldset>
+                        </div>
+
+                        <div class="mb-6">
+                            <p-fieldset legend="Address" [toggleable]="true">
+                                <p-fluid>
+                                    <div class="mb-4">
+                                        <div class=" flex flex-col gap-6 w-full">
+
+                                            <div class="flex flex-wrap">
+                                                <label for="street">Street</label>
+                                                <input pInputText id="street" type="text"/>
+                                            </div>
+
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="city">City</label>
+                                                    <input pInputText id="city" type="text"/>
+                                                </div>
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="state">State</label>
+                                                    <input pInputText id="state" type="text"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="country">Country</label>
+                                                    <p-select id="country" [(ngModel)]="country"
+                                                              [options]="countryList" optionLabel="name"
+                                                              [filter]="true"
+                                                              filterBy="name"
+                                                              optionValue="name"
+                                                              placeholder="Select Country" class="w-full"
+                                                              appendTo="body"
+                                                    ></p-select>
+                                                </div>
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <label for="postal">Postal Code</label>
+                                                    <input pInputText id="postal" type="text"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-fluid>
+                            </p-fieldset>
+                        </div>
+
+                        <div class="mb-6">
+                            <p-fieldset legend="Pricing" [toggleable]="true">
+                                <p-fluid>
+                                    <div class="mb-4">
+                                        <div class=" flex flex-col gap-6 w-full">
+
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
                                                     <div class="flex flex-wrap gap-2 w-full">
-                                                        <label for="name">Name</label>
-                                                        <input pInputText id="name" type="text"/>
+                                                        <label for="originalPrice">Original Price</label>
+                                                        <p-inputnumber id="originalPrice" mode="currency" currency="AED"/>
                                                     </div>
                                                     <div class="flex flex-wrap gap-2 w-full">
-                                                        <label for="project">Project</label>
-                                                        <input pInputText id="project" type="text"/>
+                                                        <label for="listingPrice">Listing Price</label>
+                                                        <p-inputnumber id="listingPrice" mode="currency" currency="AED"/>
                                                     </div>
                                                 </div>
 
-                                                <div class="flex flex-wrap">
-                                                    <label for="description">Description</label>
-                                                    <textarea pTextarea id="description" rows="4"></textarea>
-                                                </div>
-
-                                                <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
                                                     <div class="flex flex-wrap gap-2 w-full">
-                                                        <label for="type">Property Type</label>
-                                                        <p-select id="type" [(ngModel)]="propertyType"
-                                                                  [options]="propertyTypes" optionLabel="name"
-                                                                  placeholder="Select Type" class="w-full"
-                                                                  appendTo="body"
-                                                        ></p-select>
+                                                        <label for="totalArea">Total Area (ft<sup>2</sup>)</label>
+                                                        <p-inputnumber inputId="totalArea" />
                                                     </div>
                                                     <div class="flex flex-wrap gap-2 w-full">
-                                                        <label for="listingType">Listing Type</label>
-                                                        <p-select id="listingType" [(ngModel)]="listingType"
-                                                                  [options]="listingTypes" optionLabel="name"
-                                                                  placeholder="Select Listing Type" class="w-full"
-                                                                  appendTo="body"
-                                                        ></p-select>
+                                                        <label for="ratePerArea">Rate Per Area</label>
+                                                        <p-inputnumber inputId="ratePerArea" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </p-fluid>
+                            </p-fieldset>
+                        </div>
+
+                        <div class="mb-6">
+                            <p-fieldset legend="Features" [toggleable]="true">
+                                <p-fluid>
+                                    <div class="mb-4">
+                                        <div class=" flex flex-col gap-6 w-full">
+
+                                            <div class="flex flex-col md:flex-row gap-6">
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <div class="flex flex-wrap gap-2 w-full">
+                                                        <label for="Feature">Feature</label>
+                                                        <input pInputText id="city" type="text"/>
+                                                    </div>
+                                                    <div class="flex flex-wrap gap-2 w-full">
+                                                        <label for="featureDescription">Description</label>
+                                                        <textarea pTextarea id="featureDescription"
+                                                                  rows="4"></textarea>
+                                                    </div>
+                                                    <div class="flex flex-wrap gap-2 w-full">
+                                                        <p-button label="Add" variant="outlined"/>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex flex-wrap gap-2 w-full">
+                                                    <div class="flex flex-wrap gap-2 w-full">
+                                                        <p-table [value]="features" stripedRows
+                                                                 [tableStyle]="{'min-width': '50rem'}">
+                                                            <ng-template #header>
+                                                                <tr>
+                                                                    <th>Feature</th>
+                                                                    <th>Description</th>
+                                                                    <th></th>
+
+                                                                </tr>
+                                                            </ng-template>
+                                                            <ng-template #body let-feature>
+                                                                <tr>
+                                                                    <td>{{ feature.name }}</td>
+                                                                    <td>{{ feature.description }}</td>
+                                                                    <td>
+                                                                        <p-button icon="pi pi-pencil" class="mr-2"
+                                                                                  [rounded]="true"
+                                                                                  [outlined]="true"/>
+                                                                        <p-button icon="pi pi-trash"
+                                                                                  severity="danger" [rounded]="true"
+                                                                                  [outlined]="true"/>
+                                                                    </td>
+                                                                </tr>
+                                                            </ng-template>
+                                                        </p-table>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </p-fluid>
-                                </p-accordion-content>
-                            </p-accordion-panel>
-                            <p-accordion-panel value="1">
-                                <p-accordion-header>Address</p-accordion-header>
-                                <p-accordion-content>
-                                    <p class="m-0">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut
-                                        labore et dolore
-                                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                        nisi ut
-                                        aliquip
-                                        ex ea commodo
-                                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                        dolore eu
-                                        fugiat nulla
-                                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                        officia deserunt
-                                        mollit anim id est
-                                        laborum.
-                                    </p>
-                                </p-accordion-content>
-                            </p-accordion-panel>
+                                    </div>
+                                </p-fluid>
+                            </p-fieldset>
+                        </div>
 
-                            <p-accordion-panel value="2">
-                                <p-accordion-header>Pricing</p-accordion-header>
-                                <p-accordion-content>
-                                    <p class="m-0">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut
-                                        labore et dolore
-                                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                        nisi ut
-                                        aliquip
-                                        ex ea commodo
-                                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                        dolore eu
-                                        fugiat nulla
-                                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                        officia deserunt
-                                        mollit anim id est
-                                        laborum.
-                                    </p>
-                                </p-accordion-content>
-                            </p-accordion-panel>
 
-                            <p-accordion-panel value="3">
-                                <p-accordion-header>Features</p-accordion-header>
-                                <p-accordion-content>
-                                    <p class="m-0">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut
-                                        labore et dolore
-                                        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                        nisi ut
-                                        aliquip
-                                        ex ea commodo
-                                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                        dolore eu
-                                        fugiat nulla
-                                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                        officia deserunt
-                                        mollit anim id est
-                                        laborum.
-                                    </p>
-                                </p-accordion-content>
-                            </p-accordion-panel>
-
-                        </p-accordion>
                     </p-tabpanel>
                     <p-tabpanel value="1">
                         <p class="m-0">
@@ -206,10 +301,19 @@ import {Fluid, FluidModule} from "primeng/fluid";
             </p-tabs>
         </div>
 
+        <div class="card">
+            <p-fluid>
+                <div class="flex gap-2 justify-center">
+                    <p-button label="Save" variant="outlined" icon="pi pi-pencil"/>
+                    <p-button label="Cancel" severity="danger" variant="outlined" icon="pi pi-times"/>
+                </div>
+            </p-fluid>
+        </div>
 
 
+    `,
+    providers: [CountryService]
 
-    `
 })
 export class PropertyEdit {
     propertyTypes = [
@@ -225,4 +329,40 @@ export class PropertyEdit {
 
     propertyType = null;
     listingType = null;
+    country = null;
+    project = null;
+
+    countryService = inject(CountryService);
+
+    countryList: Country[] | undefined
+
+    items: MenuItem[] = [];
+
+    autoFilteredValue: any[] = [];
+
+    features: Feature[] = []
+
+    constructor(private projectService: ProjectService) {
+    }
+
+    ngOnInit() {
+        this.countryService.getCountries().then((countries) => {
+            this.countryList = countries;
+        });
+
+        this.items = [{label: 'Update', icon: 'pi pi-refresh'}, {
+            label: 'Delete',
+            icon: 'pi pi-times'
+        }, {label: 'Angular.io', icon: 'pi pi-info', url: 'http://angular.io'}, {separator: true}, {
+            label: 'Setup',
+            icon: 'pi pi-cog'
+        }];
+
+    }
+
+    filterProjects(event: AutoCompleteCompleteEvent) {
+        const query = event.query;
+        this.projectService.getProjectsByName(query)
+            .then(data => this.autoFilteredValue = data);
+    }
 }

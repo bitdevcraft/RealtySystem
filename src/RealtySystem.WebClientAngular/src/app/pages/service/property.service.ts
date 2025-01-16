@@ -1,6 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Project} from "./project.service";
 
+export interface Feature {
+    name?: string | null;
+    description?: string | null;
+}
+
 export interface Property {
     id?: string | null;
     name?: string | null;
@@ -10,9 +15,9 @@ export interface Property {
     ratePerArea?: number| null;
     rooms?: number| null;
     type?: string | null;
-    details?: { [key: string]: string } | null;
     projectId?: string | null;
     project?: Project | null;
+    features?: Feature[];
 }
 
 @Injectable({
