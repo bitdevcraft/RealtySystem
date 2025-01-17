@@ -10,6 +10,7 @@ export interface MilestoneFee {
 }
 
 export interface Milestone {
+    id? : string | null;
     name?: string | null;
     description?: string | null;
     remarks?: string | null;
@@ -43,6 +44,7 @@ export class PaymentplanService {
                 description: "",
                 milestones: [
                     {
+                        id: "1",
                         name: "Booking",
                         description: "",
                         remarks: "",
@@ -73,6 +75,7 @@ export class PaymentplanService {
                         ]
                     },
                     {
+                        id: "2",
                         name: "Installment",
                         description: "",
                         remarks: "",
@@ -86,6 +89,7 @@ export class PaymentplanService {
                         fees: []
                     },
                     {
+                        id: "3",
                         name: "Installment",
                         description: "",
                         remarks: "",
@@ -108,6 +112,7 @@ export class PaymentplanService {
                         ]
                     },
                     {
+                        id: "4",
                         name: "Installment",
                         description: "",
                         remarks: "",
@@ -121,6 +126,7 @@ export class PaymentplanService {
                         fees: []
                     },
                     {
+                        id: "5",
                         name: "Post-Handover",
                         description: "",
                         remarks: "",
@@ -138,28 +144,38 @@ export class PaymentplanService {
             {
                 id: '2',
                 name: "Payment Plan 2",
-                description: ""
+                description: "",
+                milestones: []
             },
             {
                 id: '3',
                 name: "Payment Plan 3",
-                description: ""
+                description: "",
+                milestones: []
+
             },
             {
                 id: '4',
                 name: "Payment Plan 4",
-                description: ""
+                description: "",
+                milestones: []
+
             },
             {
                 id: '5',
                 name: "Payment Plan 5",
-                description: ""
+                description: "",
+                milestones: []
             },
         ];
     }
 
     getPaymentPlans() {
         return Promise.resolve(this.getData());
+    }
+
+    getPaymentPlan(id: string) {
+        return Promise.resolve(this.getData().find(p => p.id === id));
     }
 
     constructor() {
