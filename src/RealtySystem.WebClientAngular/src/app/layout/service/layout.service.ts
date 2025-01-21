@@ -1,5 +1,5 @@
-import { Injectable, effect, signal, computed } from '@angular/core';
-import { Subject } from 'rxjs';
+import {Injectable, effect, signal, computed} from '@angular/core';
+import {Subject} from 'rxjs';
 
 export interface layoutConfig {
     preset?: string;
@@ -79,6 +79,8 @@ export class LayoutService {
     private initialized = false;
 
     constructor() {
+
+
         effect(() => {
             const config = this.layoutConfig();
             if (config) {
@@ -96,6 +98,19 @@ export class LayoutService {
 
             this.handleDarkModeTransition(config);
         });
+
+
+    }
+
+    handleLocalStoreTheme() {
+        const theme = localStorage.getItem('theme');
+        if (theme) {
+            this.layoutConfig.set({...JSON.parse(theme)});
+        }
+        const state = localStorage.getItem('layoutState');
+        if (state) {
+            this.layoutState.set({...JSON.parse(state)});
+        }
     }
 
     private handleDarkModeTransition(config: layoutConfig): void {
@@ -116,7 +131,8 @@ export class LayoutService {
             .then(() => {
                 this.onTransitionEnd();
             })
-            .catch(() => {});
+            .catch(() => {
+            });
     }
 
     toggleDarkMode(config?: layoutConfig): void {
@@ -137,7 +153,7 @@ export class LayoutService {
 
     onMenuToggle() {
         if (this.isOverlay()) {
-            this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
+            this.layoutState.update((prev) => ({...prev, overlayMenuActive: !this.layoutState().overlayMenuActive}));
 
             if (this.layoutState().overlayMenuActive) {
                 this.overlayOpen.next(null);
@@ -145,14 +161,23 @@ export class LayoutService {
         }
 
         if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
+            this.layoutState.update((prev) => ({
+                ...prev,
+                staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive
+            }));
         } else {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+            this.layoutState.update((prev) => ({
+                ...prev,
+                staticMenuMobileActive: !this.layoutState().staticMenuMobileActive
+            }));
 
             if (this.layoutState().staticMenuMobileActive) {
                 this.overlayOpen.next(null);
             }
         }
+
+        localStorage.setItem('layoutState', JSON.stringify(this.layoutState()));
+
     }
 
     isDesktop() {
@@ -164,8 +189,9 @@ export class LayoutService {
     }
 
     onConfigUpdate() {
-        this._config = { ...this.layoutConfig() };
+        this._config = {...this.layoutConfig()};
         this.configUpdate.next(this.layoutConfig());
+        localStorage.setItem('theme', JSON.stringify(this.layoutConfig()));
     }
 
     onMenuStateChange(event: MenuChangeEvent) {
