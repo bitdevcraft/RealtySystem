@@ -22,7 +22,7 @@ import {CountryService} from "../../service/country.service";
 import {CommunityService} from "../../service/community.service";
 import {AutoComplete, AutoCompleteCompleteEvent} from "primeng/autocomplete";
 import {PaymentPlan, PaymentplanService} from "../../service/paymentplan.service";
-import {PencilIcon, PlusIcon} from "primeng/icons";
+import {PencilIcon, PlusIcon, SearchIcon} from "primeng/icons";
 import {RouterLink} from "@angular/router";
 
 
@@ -61,6 +61,7 @@ interface ExportColumn {
         PlusIcon,
         RouterLink,
         PencilIcon,
+        SearchIcon,
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -144,7 +145,7 @@ interface ExportColumn {
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
                             <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
-                                <PencilIcon pButtonIcon/>
+                                <SearchIcon pButtonIcon/>
                             </a>
 <!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
 <!--                                      (click)="editRecord(record)"/>-->
