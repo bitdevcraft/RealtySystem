@@ -24,7 +24,7 @@ import { CommunityService } from '../../service/community.service';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Property, PropertyService } from '../../service/property.service';
 import { RouterModule } from '@angular/router';
-import {PencilIcon, PlusIcon, SearchIcon, WindowMaximizeIcon} from 'primeng/icons';
+import { PencilIcon, PlusIcon, SearchIcon, WindowMaximizeIcon } from 'primeng/icons';
 
 interface Column {
     field: string;
@@ -121,7 +121,7 @@ interface ExportColumn {
                             </div>
                         </div>
                     </th>
-                    <th pSortableColumn="type" style="min-width:8rem">
+                    <th pSortableColumn="type" style="min-width:12rem">
                         <div class="flex justify-between items-center pr-4">
                             Type
                             <div>
