@@ -22,7 +22,7 @@ import {CountryService} from "../../service/country.service";
 import {CommunityService} from "../../service/community.service";
 import {AutoComplete, AutoCompleteCompleteEvent} from "primeng/autocomplete";
 import {PaymentPlan, PaymentplanService} from "../../service/paymentplan.service";
-import {PlusIcon} from "primeng/icons";
+import {PencilIcon, PlusIcon} from "primeng/icons";
 import {RouterLink} from "@angular/router";
 
 
@@ -60,6 +60,7 @@ interface ExportColumn {
         ConfirmDialogModule,
         PlusIcon,
         RouterLink,
+        PencilIcon,
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -142,8 +143,11 @@ interface ExportColumn {
                     <td>{{ record.description }}</td>
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
-                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                                      (click)="editRecord(record)"/>
+                            <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
+                                <PencilIcon pButtonIcon/>
+                            </a>
+<!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
+<!--                                      (click)="editRecord(record)"/>-->
                             <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                                       (click)="deleteRecord(record)"/>
                         </div>
@@ -339,7 +343,7 @@ export class PaymentplanView {
 
     clear(table: Table) {
         table.clear();
-        this.filter.nativeElement.value = '';
+        if (this.filter) this.filter.nativeElement.value = '';
     }
 
     filterCommunity(event: AutoCompleteCompleteEvent) {

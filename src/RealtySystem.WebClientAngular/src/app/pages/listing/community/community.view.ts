@@ -66,7 +66,8 @@ interface ExportColumn {
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true"/>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"
+                          [disabled]="true"/>
             </ng-template>
         </p-toolbar>
 
@@ -104,10 +105,14 @@ interface ExportColumn {
                         <p-tableHeaderCheckbox/>
                     </th>
                     <th pSortableColumn="name" style="min-width:16rem">
-                        Name
-                        <p-sortIcon field="name"/>
-                        <p-columnFilter type="text" field="name" display="menu"
-                                        placeholder="Search by name"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Name
+                            <div>
+                                <p-sortIcon field="name"/>
+                                <p-columnFilter type="text" field="name" display="menu"
+                                                placeholder="Search by name"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
@@ -117,12 +122,24 @@ interface ExportColumn {
                         </div>
                     </th>
                     <th pSortableColumn="city" style="min-width:10rem">
-                        City
-                        <p-sortIcon field="city"/>
+                        <div class="flex justify-between items-center pr-4">
+                            City
+                            <div>
+                                <p-sortIcon field="city"/>
+                                <p-columnFilter type="text" field="city" display="menu"
+                                                placeholder="Search by city"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th pSortableColumn="country" style="min-width: 12rem">
-                        Country
-                        <p-sortIcon field="country"/>
+                        <div class="flex justify-between items-center pr-4">
+                            Country
+                            <div>
+                                <p-sortIcon field="country"/>
+                                <p-columnFilter type="text" field="country" display="menu"
+                                                placeholder="Search by country"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th style="min-width: 12rem"></th>
                 </tr>
@@ -137,10 +154,12 @@ interface ExportColumn {
                     <td>{{ record.city }}</td>
                     <td>{{ record.country }}</td>
                     <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                                  (click)="editRecord(record)"/>
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                  (click)="deleteRecord(record)"/>
+                        <div class="flex flex-wrap justify-end mr-4">
+                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                                      (click)="editRecord(record)"/>
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                                      (click)="deleteRecord(record)"/>
+                        </div>
                     </td>
                 </tr>
             </ng-template>
@@ -158,6 +177,7 @@ interface ExportColumn {
                         <label for="country" class="block font-bold mb-3">Country</label>
                         <p-select [(ngModel)]="record.country" inputId="country" [options]="countryList"
                                   [filter]="true" filterBy="name" [showClear]="true"
+                                  appendTo="body"
                                   optionLabel="name" optionValue="name" placeholder="Select a Country" fluid/>
                     </div>
                     <div>
@@ -352,6 +372,6 @@ export class CommunityView {
 
     clear(table: Table) {
         table.clear();
-        this.filter.nativeElement.value = '';
+        if (this.filter) this.filter.nativeElement.value = '';
     }
 }

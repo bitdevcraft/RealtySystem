@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 
 export interface MilestoneFee {
+    id?: string | null;
     name?: string | null;
     description?: string | null;
     fixedAmount?: number | null;
@@ -57,6 +58,7 @@ export class PaymentplanService {
                         ordinalCountFromFrequency: "start",
                         fees: [
                             {
+                                id: 'Fee-1',
                                 name: "Municipality Fee",
                                 description: "",
                                 fixedAmount: 0,
@@ -65,6 +67,7 @@ export class PaymentplanService {
                                 frequency: 1
                             },
                             {
+                                id: 'Fee-2',
                                 name: "Oqood Fee",
                                 description: "",
                                 fixedAmount: 3000,
@@ -102,6 +105,7 @@ export class PaymentplanService {
                         ordinalCountFromFrequency: "continue",
                         fees: [
                             {
+                                id: 'Fee-3',
                                 name: "Admin Fee",
                                 description: "",
                                 fixedAmount: 3000,
@@ -145,7 +149,23 @@ export class PaymentplanService {
                 id: '2',
                 name: "Payment Plan 2",
                 description: "",
-                milestones: []
+                milestones: [
+                    {
+                        id: "1",
+                        name: "Booking",
+                        description: "",
+                        remarks: "",
+                        order: 1,
+                        totalPercent: 20.00,
+                        frequency: 1,
+                        frequencyIntervalType: "month",
+                        frequencyInterval: 1,
+                        percentPerFrequency: 20.00,
+                        ordinalCountFromFrequency: "start",
+                        fees: [
+                        ]
+                    },
+                ]
             },
             {
                 id: '3',

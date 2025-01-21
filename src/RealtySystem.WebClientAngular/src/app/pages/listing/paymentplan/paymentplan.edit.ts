@@ -1,8 +1,8 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {Toolbar, ToolbarModule} from "primeng/toolbar";
 import {Milestone, MilestoneFee, PaymentPlan, PaymentplanService} from "../../service/paymentplan.service";
 import {Button, ButtonDirective, ButtonModule} from "primeng/button";
-import {CommonModule, CurrencyPipe} from "@angular/common";
+import {CommonModule, CurrencyPipe, Location} from "@angular/common";
 import {Rating, RatingModule} from "primeng/rating";
 import {Ripple, RippleModule} from "primeng/ripple";
 import {TableModule, TableRowCollapseEvent, TableRowExpandEvent, TableRowReorderEvent} from "primeng/table";
@@ -20,6 +20,7 @@ import {ProgressBarModule} from "primeng/progressbar";
 import {ToastModule} from "primeng/toast";
 import {Community} from "../../service/community.service";
 import {ConfirmDialog} from "primeng/confirmdialog";
+import {ActivatedRoute} from "@angular/router";
 
 interface expandedRows {
     [key: string]: boolean;
@@ -52,6 +53,13 @@ interface expandedRows {
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
+                <div>
+                    <p-button icon="pi pi-arrow-left"
+                              [rounded]="true"
+                              variant="outlined"
+                              class="mr-2"
+                              (onClick)="goBack()"></p-button>
+                </div>
                 <div class="flex flex-col pl-2">
                     <div>
                         Payment Plan
@@ -83,7 +91,9 @@ interface expandedRows {
                                 <p-buttonGroup>
                                     <p-button label="New Milestone" severity="secondary"
                                               variant="outlined"
-                                              (onClick)="addMilestone()"></p-button>
+                                              [disabled]="paymentPlanTotalPercent >= 100"
+                                              (onClick)="addMilestone()"
+                                    ></p-button>
                                     <p-button label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}"
                                               variant="outlined"
                                               severity="secondary"
@@ -123,6 +133,7 @@ interface expandedRows {
                         <th>
                             Interval Type
                         </th>
+                        <th style="width: 4rem"></th>
                     </tr>
                 </ng-template>
                 <ng-template #body let-milestone let-expanded="expanded" let-index="rowIndex">
@@ -144,14 +155,25 @@ interface expandedRows {
                         </td>
                         <td style="min-width: 8rem; text-align: right">{{ milestone.frequencyInterval }}</td>
                         <td style="min-width: 8rem;">{{ milestone.frequencyIntervalType }}</td>
-
+                        <td>
+                            <div class="flex justify-end ">
+                                <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2"
+                                          [outlined]="true"
+                                          (onClick)="editMilestone(milestone)"
+                                />
+                                <p-button icon="pi pi-trash" severity="danger" [rounded]="true"
+                                          [outlined]="true"
+                                          (onClick)="deleteMilestone(milestone)"
+                                />
+                            </div>
+                        </td>
                     </tr>
                 </ng-template>
                 <ng-template #expandedrow let-milestone>
                     <tr style="background-color: transparent">
                         <td colspan="1"></td>
 
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="card">
                                 <p-table [value]="milestone.fees" dataKey="id" responsiveLayout="scroll">
                                     <ng-template #caption>
@@ -163,9 +185,11 @@ interface expandedRows {
                                     </ng-template>
                                     <ng-template #header>
                                         <tr>
-                                            <th pSortableColumn="id">
-                                                Name
-                                                <p-sortIcon field="price"></p-sortIcon>
+                                            <th pSortableColumn="id" style="min-width: 10rem">
+                                                <div>
+                                                    Name
+                                                    <p-sortIcon field="price"></p-sortIcon>
+                                                </div>
                                             </th>
                                             <th>Fixed Amount</th>
                                             <th>Rate</th>
@@ -176,17 +200,31 @@ interface expandedRows {
                                     <ng-template #body let-fee>
                                         <tr>
                                             <td>{{ fee.name }}</td>
-                                            <td> {{ fee.rate === 0 ? 'AED ' + (fee.fixedAmount| number: '1.2') : '' }}</td>
-                                            <td>{{ fee.fixedAmount === 0 ? (fee.rate  | number: '1.2') + ' %' : '' }}</td>
+                                            <td>
+                                                <div *ngIf="fee.fixedAmount">AED {{ fee.fixedAmount| number: '1.2' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div *ngIf="fee.rate"> {{ fee.rate  | number: '1.2' }}%</div>
+                                            </td>
                                             <td>{{ fee.isRecurring }}</td>
                                             <td>
-                                                <p-button type="button" icon="pi pi-search"></p-button>
+                                                <div class="flex justify-end ">
+                                                    <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2"
+                                                              [outlined]="true"
+                                                              (onClick)="editMilestoneFee(milestone, fee)"
+                                                    />
+                                                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true"
+                                                              [outlined]="true"
+                                                              (onClick)="deleteMilestoneFee(milestone, fee)"
+                                                    />
+                                                </div>
                                             </td>
                                         </tr>
                                     </ng-template>
                                     <ng-template #emptymessage>
                                         <tr>
-                                            <td colspan="6">There are no fees in this milestone.</td>
+                                            <td colspan="8">There are no fees in this milestone.</td>
                                         </tr>
                                     </ng-template>
                                 </p-table>
@@ -196,7 +234,7 @@ interface expandedRows {
                 </ng-template>
                 <ng-template #emptymessage>
                     <tr>
-                        <td colspan="8" style="text-align: center">No milestone found.</td>
+                        <td colspan="9" style="text-align: center">No milestone found.</td>
                     </tr>
                 </ng-template>
             </p-table>
@@ -254,7 +292,7 @@ interface expandedRows {
                 </p-fluid>
             </ng-template>
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text/>
+                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()"/>
                 <p-button label="Save" icon="pi pi-check" (onClick)="saveMilestone()"/>
             </ng-template>
         </p-dialog>
@@ -307,8 +345,8 @@ interface expandedRows {
                 </p-fluid>
             </ng-template>
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text/>
-                <p-button label="Save" icon="pi pi-check"/>
+                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()"/>
+                <p-button label="Save" icon="pi pi-check" (onClick)="saveFee()"/>
             </ng-template>
         </p-dialog>
 
@@ -343,18 +381,29 @@ export class PaymentplanEdit {
 
     feeTypes: any[] = [];
 
+    recordId!: string | null;
+
+    private readonly route = inject(ActivatedRoute);
+
     constructor(
         private paymentplanService: PaymentplanService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private _location: Location
     ) {
     }
 
     ngOnInit() {
-        this.paymentplanService.getPaymentPlan('1').then((result) => {
-            this.record = result as PaymentPlan;
-            this.milestones.set(this.record.milestones ?? []);
-        });
+
+        this.recordId = this.route.snapshot.paramMap.get('id');
+        if (this.recordId) {
+            this.paymentplanService.getPaymentPlan(this.recordId).then((result) => {
+                this.record = result as PaymentPlan;
+                this.milestones.set(this.record.milestones ?? []);
+            });
+        }
+
+        // this.loadDemoData();
 
         this.intervalTypes = [
             {label: 'day', value: 'day'},
@@ -369,9 +418,20 @@ export class PaymentplanEdit {
         ]
     }
 
+    goBack() {
+        this._location.back();
+    }
+
+    loadDemoData() {
+        this.paymentplanService.getPaymentPlan('1').then((result) => {
+            this.record = result as PaymentPlan;
+            this.milestones.set(this.record.milestones ?? []);
+        });
+    }
+
     expandAll() {
         if (!this.isExpanded) {
-            this.record.milestones?.forEach((milestone) => (milestone && milestone.id ? (this.expandedRows[milestone.id] = true) : ''));
+            this.milestones()?.forEach((milestone) => (milestone && milestone.id ? (this.expandedRows[milestone.id] = true) : ''));
         } else {
             this.expandedRows = {};
         }
@@ -388,7 +448,16 @@ export class PaymentplanEdit {
     addMilestoneFee(milestone: Milestone) {
         console.log(milestone);
         this.fee = {};
+        this.feeType = 'fixed';
+        this.milestone = milestone;
         this.feeDialog = true;
+    }
+
+    hideDialog() {
+        this.milestoneDialog = false;
+        this.feeDialog = false;
+        this.fee = {};
+        this.milestone = {};
     }
 
     addMilestone() {
@@ -433,8 +502,87 @@ export class PaymentplanEdit {
             }
 
             this.milestoneDialog = false;
-            this.record = {};
+            this.milestone = {};
+            this.submitted = false;
+
         }
+    }
+
+    editMilestone(record: Milestone) {
+        this.milestone = {...record};
+        this.milestoneDialog = true;
+    }
+
+    deleteMilestone(record: Milestone) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete ' + record.name + '?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.milestones.set(this.milestones().filter((val) => val.id !== record.id));
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Record Deleted',
+                    life: 3000
+                });
+            }
+        });
+    }
+
+    editMilestoneFee(milestone: Milestone, fee: MilestoneFee) {
+        this.milestone = milestone;
+        this.fee = {...fee};
+        this.feeType = this.fee.rate ? 'rate' : 'fixed';
+        this.feeDialog = true;
+    }
+
+    saveFee() {
+        this.submitted = true;
+        let _fees = this.milestone.fees ?? [];
+
+        if (this.fee.name?.trim()) {
+            if (!this.milestone.fees) {
+                this.milestone.fees = [];
+            }
+
+            if (this.feeType === 'fixed') {
+                this.fee.rate = null;
+            } else if (this.feeType === 'rate') {
+                this.fee.fixedAmount = null;
+            }
+
+            if (this.fee.id) {
+                _fees[this.milestone.fees.findIndex(f => f.id === this.fee.id)] = this.fee;
+                // this.milestone.fees[this.findIndexById(this.fee.id)] = {...this.fee};
+                this.milestone.fees = [..._fees];
+            } else {
+                this.fee.id = this.createId();
+                this.milestone.fees.push(this.fee);
+            }
+
+            this.feeDialog = false;
+            this.milestone = {};
+            this.fee = {};
+            this.submitted = false;
+        }
+    }
+
+    deleteMilestoneFee(milestone: Milestone, fee: MilestoneFee) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete ' + fee.name + '?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                milestone.fees = (milestone.fees?.filter((val) => val.id !== fee.id));
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Record Deleted',
+                    life: 3000
+                });
+            }
+        });
     }
 
     get paymentPlanTotalPercent() {

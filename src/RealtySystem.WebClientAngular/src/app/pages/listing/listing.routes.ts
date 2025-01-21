@@ -11,6 +11,8 @@ export default [
     { path: 'project', component: ProjectView },
     { path: 'property', component: PropertyView },
     { path: 'property/add', component: PropertyEdit },
+    { path: 'property/details/:id', component: PropertyEdit },
     { path: 'payment-plan', component: PaymentplanView },
     { path: 'payment-plan/add', component: PaymentplanEdit },
+    { path: 'payment-plan/details/:id', component: PaymentplanEdit },
 ] as Routes;

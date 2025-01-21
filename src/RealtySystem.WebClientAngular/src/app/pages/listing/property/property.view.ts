@@ -24,7 +24,7 @@ import {CommunityService} from "../../service/community.service";
 import {AutoComplete, AutoCompleteCompleteEvent} from "primeng/autocomplete";
 import {Property, PropertyService} from "../../service/property.service";
 import {RouterModule} from "@angular/router";
-import {PlusIcon, WindowMaximizeIcon} from "primeng/icons";
+import {PencilIcon, PlusIcon, WindowMaximizeIcon} from "primeng/icons";
 
 interface Column {
     field: string;
@@ -60,14 +60,15 @@ interface ExportColumn {
         ConfirmDialogModule,
         AutoComplete,
         RouterModule,
-        PlusIcon
+        PlusIcon,
+        PencilIcon
     ],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
-<!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>-->
-                <a routerLink="/realty/listing/property/add" pButton class="mr-2" severity="secondary"   >
-                    <PlusIcon pButtonIcon />
+                <!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>-->
+                <a routerLink="/realty/listing/property/add" pButton class="mr-2" severity="secondary">
+                    <PlusIcon pButtonIcon/>
                     <span pButtonLabel>New</span>
                 </a>
                 <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
@@ -115,49 +116,73 @@ interface ExportColumn {
                         <p-tableHeaderCheckbox/>
                     </th>
                     <th pSortableColumn="name" style="min-width:16rem">
-                        Name
-                        <p-sortIcon field="name"/>
-                        <p-columnFilter type="text" field="name" display="menu"
-                                        placeholder="Search by name"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Name
+                            <div>
+                                <p-sortIcon field="name"/>
+                                <p-columnFilter type="text" field="name" display="menu"
+                                                placeholder="Search by name"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th pSortableColumn="type" style="min-width:8rem">
-                        Type
-                        <p-sortIcon field="type"/>
-                        <p-columnFilter field="type" matchMode="equals" display="menu">
-                            <ng-template #filter let-value let-filter="filterCallback">
-                                <p-select [ngModel]="value" [options]="types"
-                                          (onChange)="filter($event.value)" placeholder="Any"
-                                          [style]="{ 'min-width': '12rem' }">
-                                    <ng-template let-option #item>
+                        <div class="flex justify-between items-center pr-4">
+                            Type
+                            <div>
+                                <p-sortIcon field="type"/>
+                                <p-columnFilter field="type" matchMode="equals" display="menu">
+                                    <ng-template #filter let-value let-filter="filterCallback">
+                                        <p-select [ngModel]="value" [options]="types"
+                                                  (onChange)="filter($event.value)" placeholder="Any"
+                                                  [style]="{ 'min-width': '12rem' }">
+                                            <ng-template let-option #item>
                                                 <span
                                                     [class]="'customer-badge status-' + option.value">{{ option.label }}</span>
+                                            </ng-template>
+                                        </p-select>
                                     </ng-template>
-                                </p-select>
-                            </ng-template>
-                        </p-columnFilter>
+                                </p-columnFilter>
+                            </div>
+                        </div>
                     </th>
 
                     <th pSortableColumn="project" style="min-width: 12rem">
-                        Project
-                        <p-sortIcon field="project"/>
-                        <p-columnFilter type="text" field="project.name" display="menu"
-                                        placeholder="Search by project"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Project
+                            <div>
+                                <p-sortIcon field="project"/>
+                                <p-columnFilter type="text" field="project.name" display="menu"
+                                                placeholder="Search by project"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th pSortableColumn="price" style="min-width: 12rem">
-                        Price
-                        <p-sortIcon field="price"/>
-                        <p-columnFilter type="numeric" field="price" display="menu"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Price
+                            <div>
+                                <p-sortIcon field="price"/>
+                                <p-columnFilter type="numeric" field="price" display="menu"></p-columnFilter>
+                            </div>
+                        </div>
 
                     </th>
                     <th pSortableColumn="totalArea" style="min-width: 12rem">
-                        Total Area
-                        <p-sortIcon field="totalArea"/>
-                        <p-columnFilter type="numeric" field="totalArea" display="menu"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Total Area
+                            <div>
+                                <p-sortIcon field="totalArea"/>
+                                <p-columnFilter type="numeric" field="totalArea" display="menu"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th pSortableColumn="rooms" style="min-width: 12rem">
-                        Rooms
-                        <p-sortIcon field="rooms"/>
-                        <p-columnFilter type="numeric" field="rooms" display="menu"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Rooms
+                            <div>
+                                <p-sortIcon field="rooms"/>
+                                <p-columnFilter type="numeric" field="rooms" display="menu"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th style="min-width: 12rem"></th>
                 </tr>
@@ -175,10 +200,15 @@ interface ExportColumn {
                     <td>{{ record.rooms }}</td>
 
                     <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                                  (click)="editRecord(record)"/>
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                  (click)="deleteRecord(record)"/>
+                        <div class="flex flex-wrap justify-end mr-4">
+<!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
+<!--                                      (click)="editRecord(record)"/>-->
+                            <a [routerLink]="['/realty/listing/property/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
+                                <PencilIcon pButtonIcon/>
+                            </a>
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                                      (click)="deleteRecord(record)"/>
+                        </div>
                     </td>
                 </tr>
             </ng-template>
@@ -193,9 +223,12 @@ interface ExportColumn {
                         <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
                     </div>
                     <div>
-                        <p-autocomplete [(ngModel)]="record.project" [suggestions]="autoFilteredValue"
-                                        optionLabel="name" placeholder="Search" dropdown
-                                        (completeMethod)="filterProjects($event)" fluid/>
+                        <p-autocomplete [(ngModel)]="record.project"
+                                        [suggestions]="autoFilteredValue"
+                                        optionLabel="name"
+                                        placeholder="Search"
+                                        dropdown
+                                        (completeMethod)="filterProjects($event)" fluid></p-autocomplete>
                     </div>
                     <div>
                         <label for="description" class="block font-bold mb-3">Description</label>
@@ -387,7 +420,7 @@ export class PropertyView {
 
     clear(table: Table) {
         table.clear();
-        this.filter.nativeElement.value = '';
+        if (this.filter) this.filter.nativeElement.value = '';
     }
 
     filterProjects(event: AutoCompleteCompleteEvent) {

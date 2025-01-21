@@ -107,10 +107,14 @@ interface ExportColumn {
                         <p-tableHeaderCheckbox/>
                     </th>
                     <th pSortableColumn="name" style="min-width:16rem">
-                        Name
-                        <p-sortIcon field="name"/>
-                        <p-columnFilter type="text" field="name" display="menu"
-                                        placeholder="Search by name"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Name
+                            <div>
+                                <p-sortIcon field="name"/>
+                                <p-columnFilter type="text" field="name" display="menu"
+                                                placeholder="Search by name"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
@@ -120,10 +124,14 @@ interface ExportColumn {
                         </div>
                     </th>
                     <th pSortableColumn="community" style="min-width: 12rem">
-                        Community
-                        <p-sortIcon field="community"/>
-                        <p-columnFilter type="text" field="community.name" display="menu"
-                                        placeholder="Search by community"></p-columnFilter>
+                        <div class="flex justify-between items-center pr-4">
+                            Community
+                            <div>
+                                <p-sortIcon field="community"/>
+                                <p-columnFilter type="text" field="community.name" display="menu"
+                                                placeholder="Search by community"></p-columnFilter>
+                            </div>
+                        </div>
                     </th>
                     <th style="min-width: 12rem"></th>
                 </tr>
@@ -137,10 +145,12 @@ interface ExportColumn {
                     <td>{{ record.description }}</td>
                     <td>{{ record.community?.name }}</td>
                     <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                                  (click)="editRecord(record)"/>
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                  (click)="deleteRecord(record)"/>
+                        <div class="flex flex-wrap justify-end mr-4">
+                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                                      (click)="editRecord(record)"/>
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                                      (click)="deleteRecord(record)"/>
+                        </div>
                     </td>
                 </tr>
             </ng-template>
@@ -155,9 +165,22 @@ interface ExportColumn {
                         <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
                     </div>
                     <div>
-                        <p-autocomplete [(ngModel)]="record.community" [suggestions]="autoFilteredValue"
-                                        optionLabel="name" placeholder="Search" dropdown
-                                        (completeMethod)="filterCommunity($event)" fluid/>
+                        <label for="community" class="block font-bold mb-3">Community</label>
+                        <p-autocomplete [(ngModel)]="record.community"
+                                        [suggestions]="autoFilteredValue"
+                                        optionLabel="name"
+                                        placeholder="Search"
+                                        (completeMethod)="filterCommunity($event)"
+                                        fluid
+                                        appendTo="body"
+                                        id="community"
+                        >
+                            <!--                            <ng-template #footer>-->
+                            <!--                                <div class="px-3 py-3">-->
+                            <!--                                    <p-button label="Add New" fluid severity="secondary" text size="small" icon="pi pi-plus" />-->
+                            <!--                                </div>-->
+                            <!--                            </ng-template>-->
+                        </p-autocomplete>
                     </div>
                     <div>
                         <label for="description" class="block font-bold mb-3">Description</label>
@@ -340,7 +363,7 @@ export class ProjectView {
 
     clear(table: Table) {
         table.clear();
-        this.filter.nativeElement.value = '';
+        if (this.filter) this.filter.nativeElement.value = '';
     }
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
