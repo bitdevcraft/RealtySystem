@@ -2265,4 +2265,8 @@ export class PropertyService {
     getPropertyById(id: string) {
         return Promise.resolve(this.getData().find((p) => p.id === id));
     }
+
+    getPropertyByProject(projectId: string) {
+        return Promise.resolve(this.getData().slice(0, 10));
+    }
 }

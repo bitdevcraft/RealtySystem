@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ModelSignal, signal, ViewChild } from '@angular/core';
 import { Project, ProjectService } from '../../service/project.service';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +12,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { CommunityService } from '../../service/community.service';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Textarea } from 'primeng/textarea';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Property, PropertyService } from '../../service/property.service';
 import { Table, TableModule } from 'primeng/table';
 import { IconField } from 'primeng/iconfield';
@@ -21,6 +21,7 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Select, SelectModule } from 'primeng/select';
+import { SearchIcon } from 'primeng/icons';
 
 interface Column {
     field: string;
@@ -55,7 +56,8 @@ interface ExportColumn {
         RouterModule,
         ConfirmDialog,
         SelectModule,
-        FormsModule
+        FormsModule,
+        SearchIcon
     ],
     styles: `
         .parent-container .button-container {
@@ -85,15 +87,15 @@ interface ExportColumn {
         </p-toolbar>
 
         <div class="mb-6">
-            <p-tabs value="0" scrollable>
+            <p-tabs [value]="tabValue" scrollable (valueChange)="eventTabChange($event)">
                 <p-tablist>
-                    <p-tab value="0">Details</p-tab>
-                    <p-tab value="1">Properties</p-tab>
-                    <p-tab value="2">Payment Plans</p-tab>
-                    <p-tab value="3">Marketing and Media</p-tab>
+                    <p-tab [value]="0">Details</p-tab>
+                    <p-tab [value]="1">Properties</p-tab>
+                    <p-tab [value]="2">Payment Plans</p-tab>
+                    <p-tab [value]="3">Marketing and Media</p-tab>
                 </p-tablist>
                 <p-tabpanels>
-                    <p-tabpanel value="0">
+                    <p-tabpanel [value]="0">
                         <form action="" [formGroup]="recordForm" (ngSubmit)="saveRecord()">
                             <div class="mb-6">
                                 <p-fieldset legend="Project Details" [toggleable]="true">
@@ -161,7 +163,7 @@ interface ExportColumn {
                             </div>
                         </form>
                     </p-tabpanel>
-                    <p-tabpanel value="1">
+                    <p-tabpanel [value]="1">
                         <p-table
                             #dt
                             [value]="properties()"
@@ -220,16 +222,6 @@ interface ExportColumn {
                                             </div>
                                         </div>
                                     </th>
-
-                                    <th pSortableColumn="project" style="min-width: 12rem">
-                                        <div class="flex justify-between items-center pr-4">
-                                            Project
-                                            <div>
-                                                <p-sortIcon field="project" />
-                                                <p-columnFilter type="text" field="project.name" display="menu" placeholder="Search by project"></p-columnFilter>
-                                            </div>
-                                        </div>
-                                    </th>
                                     <th pSortableColumn="price" style="min-width: 12rem">
                                         <div class="flex justify-between items-center pr-4">
                                             Price
@@ -267,7 +259,6 @@ interface ExportColumn {
                                     </td>
                                     <td style="min-width: 16rem">{{ record.name }}</td>
                                     <td style="min-width: 8rem">{{ record.type }}</td>
-                                    <td>{{ record.project?.name }}</td>
                                     <td>{{ record.price | number: '1.0-0' | prefixSuffix: 'AED' }}</td>
                                     <td>{{ record.totalArea | number: '1.0-0' | prefixSuffix: '' : 'ft&sup2;' }}</td>
                                     <td>{{ record.rooms }}</td>
@@ -286,8 +277,8 @@ interface ExportColumn {
                             </ng-template>
                         </p-table>
                     </p-tabpanel>
-                    <p-tabpanel value="2"> </p-tabpanel>
-                    <p-tabpanel value="3"> </p-tabpanel>
+                    <p-tabpanel [value]="2"> </p-tabpanel>
+                    <p-tabpanel [value]="3"> </p-tabpanel>
                 </p-tabpanels>
             </p-tabs>
         </div>
@@ -319,6 +310,10 @@ export class ProjectEdit {
 
     types: any[] = [];
 
+    tabValue: number = 0;
+
+    queryParams: any;
+
     private readonly route = inject(ActivatedRoute);
 
     constructor(
@@ -327,6 +322,7 @@ export class ProjectEdit {
         private messageService: MessageService,
         private projectService: ProjectService,
         private propertyService: PropertyService,
+        private router: Router,
         private _location: Location,
         private fb: FormBuilder
     ) {
@@ -347,23 +343,25 @@ export class ProjectEdit {
 
                 this.recordForm.patchValue(result as Project);
             });
+
+            this.propertyService.getPropertyByProject(this.recordId).then((data) => {
+                this.properties.set(data);
+            });
         } else {
             this.editMode = true;
         }
+
+        this.route.queryParams.subscribe((params) => {
+            this.queryParams = params;
+
+            this.tabValue = Number(this.queryParams['tab'] ?? 0);
+        });
 
         this.types = [
             { label: 'Unit', value: 'Unit' },
             { label: 'Villa', value: 'Villa' },
             { label: 'Plot', value: 'Plot' }
         ];
-
-        this.loadDemoData();
-    }
-
-    loadDemoData() {
-        this.propertyService.getPropertiesLarge().then((data) => {
-            this.properties.set(data);
-        });
     }
 
     get recordFormValue() {
@@ -433,6 +431,15 @@ export class ProjectEdit {
                     life: 3000
                 });
             }
+        });
+    }
+
+    eventTabChange(event: any) {
+        this.tabValue = event;
+
+        this.router.navigate([], {
+            queryParams: { tab: event },
+            queryParamsHandling: 'merge' // Merge with existing query params
         });
     }
 }
