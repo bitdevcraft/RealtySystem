@@ -67,23 +67,13 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                 <div>
                     <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
-                <div class="flex flex-col pl-2">
+                <div class="flex flex-col pl-2 pt-0">
                     <div>Property</div>
-                    <div>Name</div>
+                    <div class="font-bold size-2 min-w-32">{{ propertyValue.name }}</div>
                 </div>
             </ng-template>
 
-            <ng-template #end>
-                <div>
-                    <p-buttongroup>
-                        <!--                        <p-button label="Save" variant="outlined" icon="pi pi-pencil"/>-->
-                        <!--                        <p-button label="Cancel" severity="danger" variant="outlined" icon="pi pi-times"/>-->
-
-                        <!--                        <p-button label="Quick Action" severity="secondary" variant="outlined"/>-->
-                        <!--                        <p-button label="Preview" severity="secondary" variant="outlined"/>-->
-                    </p-buttongroup>
-                </div>
-            </ng-template>
+            <ng-template #end> </ng-template>
         </p-toolbar>
 
         <div class="mb-6">
@@ -131,6 +121,29 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                         <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.project?.name }}
+                                                            </div>
+                                                            <div class="button-container">
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-wrap flex-col gap-2 w-full">
+                                                        <label class="font-bold" for="listingType">Status</label>
+                                                        <p-select
+                                                            id="listingType"
+                                                            formControlName="status"
+                                                            *ngIf="editMode"
+                                                            [options]="statuses"
+                                                            optionLabel="name"
+                                                            optionValue="code"
+                                                            placeholder="Current Status"
+                                                            class="w-full"
+                                                            appendTo="body"
+                                                        ></p-select>
+
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
+                                                            <div>
+                                                                {{ propertyValue.status }}
                                                             </div>
                                                             <div class="button-container">
                                                                 <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
@@ -393,6 +406,14 @@ export class PropertyEdit {
         { name: 'Rental', code: 'Rental' }
     ];
 
+    statuses = [
+        { name: 'Draft', code: 'Draft' },
+        { name: 'Available', code: 'Available' },
+        { name: 'Sold', code: 'Sold' },
+        { name: 'Hold', code: 'Hold' },
+        { name: 'Not For Sale', code: 'Not For Sale' }
+    ];
+
     propertyType = null;
 
     listingType = null;
@@ -451,7 +472,8 @@ export class PropertyEdit {
                 state: [''],
                 country: [''],
                 postalCode: ['']
-            })
+            }),
+            status: new FormControl(null)
         });
     }
 

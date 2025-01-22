@@ -25,6 +25,7 @@ import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Property, PropertyService } from '../../service/property.service';
 import { RouterModule } from '@angular/router';
 import { PencilIcon, PlusIcon, SearchIcon, WindowMaximizeIcon } from 'primeng/icons';
+import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 
 interface Column {
     field: string;
@@ -62,7 +63,8 @@ interface ExportColumn {
         RouterModule,
         PlusIcon,
         PencilIcon,
-        SearchIcon
+        SearchIcon,
+        PrefixSuffixPipe
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -186,8 +188,8 @@ interface ExportColumn {
                     <td style="min-width: 16rem">{{ record.name }}</td>
                     <td style="min-width: 8rem">{{ record.type }}</td>
                     <td>{{ record.project?.name }}</td>
-                    <td>AED {{ record.price | number: '1.0-0' }}</td>
-                    <td>{{ record.totalArea | number: '1.0-0' }} ft<sup>2</sup></td>
+                    <td>{{ record.price | number: '1.0-0' | prefixSuffix: 'AED' }}</td>
+                    <td>{{ record.totalArea | number: '1.0-0' | prefixSuffix: '' : 'ft&sup2;' }}</td>
                     <td>{{ record.rooms }}</td>
 
                     <td>

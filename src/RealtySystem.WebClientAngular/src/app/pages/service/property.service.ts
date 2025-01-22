@@ -23,6 +23,7 @@ export interface Property {
     features?: Feature[];
     listing?: string | null;
     address?: Address | any;
+    status?: string | null;
 }
 
 export type PropertyForm = ToFormControls<Property>;
