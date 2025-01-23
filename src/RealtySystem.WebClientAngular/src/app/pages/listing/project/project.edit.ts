@@ -76,8 +76,8 @@ interface ExportColumn {
                     <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2">
-                    <div>Project</div>
-                    <div>Name</div>
+                    <div class="text-sm text-surface-500 dark:text-surface-400">Project</div>
+                    <div>{{ record().name }}</div>
                 </div>
             </ng-template>
 

@@ -1,30 +1,29 @@
-import {Component, ElementRef, signal, ViewChild} from '@angular/core';
-import {ButtonModule} from "primeng/button";
-import {ToolbarModule} from "primeng/toolbar";
-import {Table, TableModule} from "primeng/table";
-import {CommonModule} from "@angular/common";
-import {IconFieldModule} from "primeng/iconfield";
-import {InputIconModule} from "primeng/inputicon";
-import {InputTextModule} from "primeng/inputtext";
-import {DialogModule} from "primeng/dialog";
-import {FormsModule} from "@angular/forms";
-import {TextareaModule} from "primeng/textarea";
-import {RippleModule} from "primeng/ripple";
-import {ToastModule} from "primeng/toast";
-import {RatingModule} from "primeng/rating";
-import {SelectModule} from "primeng/select";
-import {RadioButtonModule} from "primeng/radiobutton";
-import {InputNumberModule} from "primeng/inputnumber";
-import {TagModule} from "primeng/tag";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {CountryService} from "../../service/country.service";
-import {CommunityService} from "../../service/community.service";
-import {AutoComplete, AutoCompleteCompleteEvent} from "primeng/autocomplete";
-import {PaymentPlan, PaymentplanService} from "../../service/paymentplan.service";
-import {PencilIcon, PlusIcon, SearchIcon} from "primeng/icons";
-import {RouterLink} from "@angular/router";
-
+import { Component, ElementRef, signal, ViewChild } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
+import { Table, TableModule } from 'primeng/table';
+import { CommonModule } from '@angular/common';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { TextareaModule } from 'primeng/textarea';
+import { RippleModule } from 'primeng/ripple';
+import { ToastModule } from 'primeng/toast';
+import { RatingModule } from 'primeng/rating';
+import { SelectModule } from 'primeng/select';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { TagModule } from 'primeng/tag';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { CountryService } from '../../service/country.service';
+import { CommunityService } from '../../service/community.service';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { PaymentPlan, PaymentplanService } from '../../service/paymentplan.service';
+import { PencilIcon, PlusIcon, SearchIcon } from 'primeng/icons';
+import { RouterLink } from '@angular/router';
 
 interface Column {
     field: string;
@@ -60,25 +59,21 @@ interface ExportColumn {
         ConfirmDialogModule,
         PlusIcon,
         RouterLink,
-        PencilIcon,
-        SearchIcon,
+        SearchIcon
     ],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>-->
                 <a routerLink="/realty/listing/payment-plan/add" pButton class="mr-2" severity="secondary">
-                    <PlusIcon pButtonIcon/>
+                    <PlusIcon pButtonIcon />
                     <span pButtonLabel>New</span>
                 </a>
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
-                          (onClick)="deleteSelectedRecords()"
-                          [disabled]="!selectedRecords || !selectedRecords.length"/>
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedRecords()" [disabled]="!selectedRecords || !selectedRecords.length" />
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"
-                          [disabled]="true"/>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true" />
             </ng-template>
         </p-toolbar>
 
@@ -102,34 +97,31 @@ interface ExportColumn {
                     <h5 class="m-0">Payment Plans</h5>
                     <div class="flex gap-2">
                         <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search"/>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."/>
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
                         </p-iconfield>
-                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
-                                  class="p-button-outlined mb-2" (onClick)="clear(dt)"/>
+                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                     </div>
                 </div>
             </ng-template>
             <ng-template #header>
                 <tr>
                     <th style="width: 3rem">
-                        <p-tableHeaderCheckbox/>
+                        <p-tableHeaderCheckbox />
                     </th>
                     <th pSortableColumn="name" style="min-width:12rem">
                         <div class="flex justify-between items-center">
                             Name
                             <div>
-                                <p-sortIcon field="name"/>
-                                <p-columnFilter type="text" field="name" display="menu"
-                                                placeholder="Search by name"></p-columnFilter>
+                                <p-sortIcon field="name" />
+                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
                             </div>
                         </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
                             Description
-                            <p-columnFilter type="text" field="description" display="menu"
-                                            placeholder="Search by description"></p-columnFilter>
+                            <p-columnFilter type="text" field="description" display="menu" placeholder="Search by description"></p-columnFilter>
                         </div>
                     </th>
                     <th style="min-width: 12rem"></th>
@@ -138,19 +130,18 @@ interface ExportColumn {
             <ng-template #body let-record>
                 <tr>
                     <td style="width: 3rem">
-                        <p-tableCheckbox [value]="record"/>
+                        <p-tableCheckbox [value]="record" />
                     </td>
                     <td style="min-width: 12rem">{{ record.name }}</td>
                     <td>{{ record.description }}</td>
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
                             <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
-                                <SearchIcon pButtonIcon/>
+                                <SearchIcon pButtonIcon />
                             </a>
-<!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
-<!--                                      (click)="editRecord(record)"/>-->
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                      (click)="deleteRecord(record)"/>
+                            <!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
+                            <!--                                      (click)="editRecord(record)"/>-->
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteRecord(record)" />
                         </div>
                     </td>
                 </tr>
@@ -162,24 +153,23 @@ interface ExportColumn {
                 <div class="flex flex-col gap-6">
                     <div>
                         <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid/>
+                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
                     </div>
                     <div>
                         <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3"
-                                  cols="20" fluid></textarea>
+                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3" cols="20" fluid></textarea>
                     </div>
                 </div>
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()"/>
-                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()"/>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()" />
             </ng-template>
         </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }"/>
+        <p-confirmdialog [style]="{ width: '450px' }" />
     `,
     providers: [MessageService, ConfirmationService, CountryService, CommunityService, PaymentplanService]
 })
@@ -209,8 +199,7 @@ export class PaymentplanView {
         private paymentplanService: PaymentplanService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
-    ) {
-    }
+    ) {}
 
     exportCSV() {
         this.dt.exportCSV();
@@ -226,14 +215,14 @@ export class PaymentplanView {
         });
 
         this.cols = [
-            {field: 'code', header: 'Code', customExportHeader: 'Product Code'},
-            {field: 'name', header: 'Name'},
-            {field: 'image', header: 'Image'},
-            {field: 'price', header: 'Price'},
-            {field: 'category', header: 'Category'}
+            { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
+            { field: 'name', header: 'Name' },
+            { field: 'image', header: 'Image' },
+            { field: 'price', header: 'Price' },
+            { field: 'category', header: 'Category' }
         ];
 
-        this.exportColumns = this.cols.map((col) => ({title: col.header, dataKey: col.field}));
+        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -247,7 +236,7 @@ export class PaymentplanView {
     }
 
     editRecord(record: PaymentPlan) {
-        this.record = {...record};
+        this.record = { ...record };
         this.recordDialog = true;
     }
 
@@ -349,7 +338,6 @@ export class PaymentplanView {
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query)
-            .then(data => this.autoFilteredValue = data);
+        this.communityService.getCommunitiesByName(query).then((data) => (this.autoFilteredValue = data));
     }
 }

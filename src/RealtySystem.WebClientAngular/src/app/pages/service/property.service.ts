@@ -46,7 +46,13 @@ export class PropertyService {
                 address: {
                     country: 'United Arab Emirates'
                 },
-                type: 'Plot'
+                type: 'Plot',
+                features: [
+                    {
+                        name: 'Pool',
+                        description: 'Swimming Area'
+                    }
+                ]
             },
             {
                 id: 'P-3845',

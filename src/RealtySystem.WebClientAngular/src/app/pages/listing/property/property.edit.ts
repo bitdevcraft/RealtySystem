@@ -11,7 +11,7 @@ import { TabsModule } from 'primeng/tabs';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Fluid, FluidModule } from 'primeng/fluid';
 import { CountryService } from '../../service/country.service';
 import { Country } from '../../service/customer.service';
@@ -23,7 +23,7 @@ import { Feature, Property, PropertyService } from '../../service/property.servi
 import { TableModule } from 'primeng/table';
 import { PanelModule } from 'primeng/panel';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { CurrencyPipe, Location, NgIf } from '@angular/common';
+import { CurrencyPipe, Location, NgFor, NgIf } from '@angular/common';
 import { PaymentPlan } from '../../service/paymentplan.service';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 
@@ -49,7 +49,8 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
         ReactiveFormsModule,
         NgIf,
         CurrencyPipe,
-        PrefixSuffixPipe
+        PrefixSuffixPipe,
+        NgFor
     ],
     styles: `
         .parent-container .button-container {
@@ -68,8 +69,8 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                     <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2 pt-0">
-                    <div>Property</div>
-                    <div class="font-bold size-2 min-w-32">{{ propertyValue.name }}</div>
+                    <div class="text-sm text-surface-500 dark:text-surface-400">Property</div>
+                    <div>{{ propertyValue.name }}</div>
                 </div>
             </ng-template>
 
@@ -326,49 +327,63 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                     </p-fluid>
                                 </p-fieldset>
                             </div>
-                            <div class="mb-6" *ngIf="editMode">
+                            <div class="mb-6">
                                 <p-fieldset legend="Features" [toggleable]="true">
-                                    <p-fluid>
-                                        <div class="mb-4 mt-4">
-                                            <div class="flex flex-col md:flex-row gap-6">
-                                                <div class="flex flex-wrap gap-2 w-full">
-                                                    <div class="flex flex-wrap gap-2 w-full">
-                                                        <label class="font-bold" for="Feature">Feature</label>
-                                                        <input pInputText id="city" type="text" />
+                                    <p-fluid *ngIf="editMode">
+                                        <ng-container formArrayName="features">
+                                            <ng-container *ngFor="let feature of featureForms.controls; let i = index">
+                                                <div [formGroupName]="i" class="flex flex-col md:flex-row gap-6">
+                                                    <div class="flex flex-col gap-2 w-full">
+                                                        <label for="feature-{{ i }}">Feature</label>
+                                                        <input pInputText id="feature-{{ i }}" type="text" formControlName="name" />
+                                                        <small class="text-red-500" *ngIf="isInvalidFeature('name', i)">Name is required.</small>
                                                     </div>
-                                                    <div class="flex flex-wrap gap-2 w-full">
-                                                        <label class="font-bold" for="featureDescription">Description</label>
-                                                        <textarea pTextarea id="featureDescription" rows="4"></textarea>
+                                                    <div class="flex flex-col gap-2 w-full">
+                                                        <label for="featureDescription-{{ i }}">Description</label>
+                                                        <textarea pTextarea id="featureDescription-{{ i }}" rows="2" formControlName="description"></textarea>
                                                     </div>
-                                                    <div class="flex flex-wrap gap-2 w-full">
-                                                        <p-button label="Add" variant="outlined" (onClick)="addFeature()" />
+                                                    <div class="flex flex-wrap items-center">
+                                                        <p-button (onClick)="removeFeature(i)" icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"></p-button>
                                                     </div>
                                                 </div>
-                                                <div class="flex flex-wrap gap-2 w-full"></div>
-                                            </div>
+                                            </ng-container>
+                                        </ng-container>
+
+                                        <div class="flex flex-wrap gap-2 w-full">
+                                            <p-button label="Add" variant="outlined" (onClick)="addFeature()" />
                                         </div>
                                     </p-fluid>
+
+                                    <p-table *ngIf="!editMode" [value]="propertyValue.features" [scrollable]="true" [tableStyle]="{ 'min-width': '50rem' }">
+                                        <ng-template #header>
+                                            <tr>
+                                                <th>
+                                                    <div class="w-full flex justify-between items-center parent-container">
+                                                        Feature
+                                                        <div class="button-container">
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <div class="w-full flex justify-between items-center parent-container">
+                                                        Description
+                                                        <div class="button-container">
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template #body let-feature>
+                                            <tr>
+                                                <td>{{ feature.name }}</td>
+                                                <td>{{ feature.description }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
                                 </p-fieldset>
                             </div>
-                            <p-table [value]="features()" stripedRows [scrollable]="true" [tableStyle]="{ 'min-width': '50rem' }">
-                                <ng-template #header>
-                                    <tr>
-                                        <th>Feature</th>
-                                        <th>Description</th>
-                                        <th></th>
-                                    </tr>
-                                </ng-template>
-                                <ng-template #body let-feature>
-                                    <tr>
-                                        <td>{{ feature.name }}</td>
-                                        <td>{{ feature.description }}</td>
-                                        <td>
-                                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" />
-                                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" />
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
 
                             <div class="flex gap-2 justify-center mt-4" *ngIf="editMode">
                                 <p-button label="Cancel" severity="danger" [text]="true" icon="pi pi-times" class="mr-2" (onClick)="cancelEdit()" />
@@ -430,8 +445,6 @@ export class PropertyEdit {
 
     autoFilteredValue: any[] = [];
 
-    features = signal<Feature[]>([]);
-
     feature: Feature = {};
 
     record = signal<Property>({});
@@ -464,7 +477,6 @@ export class PropertyEdit {
             type: new FormControl(null),
             projectId: new FormControl(null),
             project: new FormControl(null),
-            features: new FormControl<Feature[] | null>([]),
             listing: new FormControl(null),
             address: this.fb.group({
                 street: [''],
@@ -473,8 +485,38 @@ export class PropertyEdit {
                 country: [''],
                 postalCode: ['']
             }),
-            status: new FormControl(null)
+            status: new FormControl(null),
+            features: this.fb.array([])
         });
+    }
+
+    get featureForms() {
+        return this.propertyForm.controls['features'] as FormArray;
+    }
+
+    private createFeature(feature?: Feature): FormGroup {
+        return this.fb.group({
+            name: [feature?.name || null, Validators.required],
+            description: [feature?.description || null]
+        });
+    }
+
+    addFeature(feature?: Feature) {
+        this.featureForms.push(this.createFeature(feature));
+    }
+
+    removeFeature(index: number) {
+        this.featureForms.removeAt(index);
+    }
+
+    featuresIndex(index: number) {
+        return this.featureForms.controls.at(index);
+    }
+
+    // Check if a control is invalid
+    isInvalidFeature(controlName: string, index: number): boolean {
+        const control = (this.featuresIndex(index) as FormGroup).get(controlName);
+        return (control?.invalid && (control?.dirty || control?.touched)) || false;
     }
 
     ngOnInit() {
@@ -484,6 +526,7 @@ export class PropertyEdit {
                 this.record.set(result as Property);
 
                 this.propertyForm.patchValue(result as Property);
+                this.record().features?.map((data) => this.addFeature(data));
             });
         } else {
             this.editMode = true;
@@ -532,6 +575,9 @@ export class PropertyEdit {
         }
         this.editMode = false;
         this.propertyForm.reset(this.record());
+        this.featureForms.clear();
+        this.record().features?.map((data) => this.addFeature(data));
+
         this.submitted = false;
     }
 
@@ -543,16 +589,12 @@ export class PropertyEdit {
 
             alert('Form Submitted succesfully!!!\n Check the values in browser console.');
             console.table(this.propertyForm.value);
+
+            console.log(JSON.stringify(this.propertyForm.value));
         }
     }
 
     get propertyFormControl() {
         return this.propertyForm.controls;
-    }
-
-    addFeature() {
-        console.log(this.feature);
-        this.features().push(this.feature);
-        this.feature = {};
     }
 }

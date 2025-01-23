@@ -66,8 +66,8 @@ interface expandedRows {
                     <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2">
-                    <div>Payment Plan</div>
-                    <div>Name</div>
+                    <div class="text-sm text-surface-500 dark:text-surface-400">Payment Plan</div>
+                    <div>{{ recordName }}</div>
                 </div>
             </ng-template>
 
@@ -290,22 +290,22 @@ interface expandedRows {
             </ng-template>
         </p-dialog>
 
-        <p-dialog [(visible)]="previewDialog" [style]="{ width: '80rem' }" header="Preview" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }">
+        <p-dialog [(visible)]="previewDialog" [style]="{ width: '80rem' }" [header]="previewHeader" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }">
             <ng-template #content>
                 <p-fluid>
                     <div class="flex flex-col gap-6 w-full">
                         <div class="flex flex-col md:flex-row gap-2 w-full">
                             <div class="flex flex-col w-full">
-                                <label for="price" class="block font-bold mb-3">Price</label>
+                                <label for="price" class="block font-bold mb-3">Sample Price</label>
                                 <p-inputnumber inputId="price" [(ngModel)]="previewPrice" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
                             </div>
                             <div class="flex flex-col w-full">
-                                <label for="price" class="block font-bold mb-3">Date</label>
+                                <label for="price" class="block font-bold mb-3">Sample Date</label>
                                 <p-datepicker [(ngModel)]="previewDate" appendTo="body" />
                             </div>
                         </div>
                         <div>
-                            <p-table [value]="previewPaymentPlanData()" showGridlines="true">
+                            <p-table [value]="previewPaymentPlanData()" showGridlines="true" [scrollable]="true" scrollHeight="500px">
                                 <ng-template #caption>
                                     <p-button severity="secondary" label="Update" (onClick)="createPreviewTable()"></p-button>
                                 </ng-template>
@@ -600,6 +600,10 @@ export class PaymentplanEdit {
         this.createPreviewTable();
     }
 
+    get previewHeader() {
+        return `${this.record?.name ?? ''} Preview`.trim();
+    }
+
     createPreviewTable() {
         const data: PaymentPlanPreview[] = [];
         let date = new Date(this.previewDate);
@@ -652,5 +656,9 @@ export class PaymentplanEdit {
         if (this.paymentPlanTotalPercent === 100) return '#10b981';
         if (this.paymentPlanTotalPercent > 40 && this.paymentPlanTotalPercent < 100) return '#f97316';
         return '#f43f5e';
+    }
+
+    get recordName() {
+        return this.record?.name ?? '';
     }
 }

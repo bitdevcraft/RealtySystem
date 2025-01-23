@@ -62,7 +62,6 @@ interface ExportColumn {
         AutoComplete,
         RouterModule,
         PlusIcon,
-        PencilIcon,
         SearchIcon,
         PrefixSuffixPipe
     ],
