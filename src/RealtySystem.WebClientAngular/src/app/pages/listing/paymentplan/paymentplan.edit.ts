@@ -1,26 +1,30 @@
-import {Component, inject, signal} from '@angular/core';
-import {Toolbar, ToolbarModule} from "primeng/toolbar";
-import {Milestone, MilestoneFee, PaymentPlan, PaymentplanService} from "../../service/paymentplan.service";
-import {Button, ButtonDirective, ButtonModule} from "primeng/button";
-import {CommonModule, CurrencyPipe, Location} from "@angular/common";
-import {Rating, RatingModule} from "primeng/rating";
-import {Ripple, RippleModule} from "primeng/ripple";
-import {TableModule, TableRowCollapseEvent, TableRowExpandEvent, TableRowReorderEvent} from "primeng/table";
-import {Tag, TagModule} from "primeng/tag";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {ButtonGroup, ButtonGroupModule} from "primeng/buttongroup";
-import {Dialog} from "primeng/dialog";
-import {InputText} from "primeng/inputtext";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {InputNumber} from "primeng/inputnumber";
-import {Fluid} from "primeng/fluid";
-import {Select} from "primeng/select";
-import {Textarea} from "primeng/textarea";
-import {ProgressBarModule} from "primeng/progressbar";
-import {ToastModule} from "primeng/toast";
-import {Community} from "../../service/community.service";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {ActivatedRoute} from "@angular/router";
+import { Component, inject, signal } from '@angular/core';
+import { Toolbar, ToolbarModule } from 'primeng/toolbar';
+import { Milestone, MilestoneFee, PaymentPlan, PaymentPlanPreview, PaymentplanService } from '../../service/paymentplan.service';
+import { Button, ButtonDirective, ButtonModule } from 'primeng/button';
+import { CommonModule, CurrencyPipe, Location, NgIf } from '@angular/common';
+import { Rating, RatingModule } from 'primeng/rating';
+import { Ripple, RippleModule } from 'primeng/ripple';
+import { TableModule, TableRowCollapseEvent, TableRowExpandEvent, TableRowReorderEvent } from 'primeng/table';
+import { Tag, TagModule } from 'primeng/tag';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ButtonGroup, ButtonGroupModule } from 'primeng/buttongroup';
+import { Dialog } from 'primeng/dialog';
+import { InputText } from 'primeng/inputtext';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { InputNumber } from 'primeng/inputnumber';
+import { Fluid } from 'primeng/fluid';
+import { Select } from 'primeng/select';
+import { Textarea } from 'primeng/textarea';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ToastModule } from 'primeng/toast';
+import { Community } from '../../service/community.service';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ActivatedRoute } from '@angular/router';
+import { DatePickerModule } from 'primeng/datepicker';
+import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
+import { InfoCircleIcon } from 'primeng/icons';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -48,123 +52,94 @@ interface expandedRows {
         Textarea,
         ProgressBarModule,
         ToastModule,
-        ConfirmDialog
+        ConfirmDialog,
+        DatePickerModule,
+        PrefixSuffixPipe,
+        NgIf,
+        InfoCircleIcon,
+        TooltipModule
     ],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <div>
-                    <p-button icon="pi pi-arrow-left"
-                              [rounded]="true"
-                              variant="outlined"
-                              class="mr-2"
-                              (onClick)="goBack()"></p-button>
+                    <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2">
-                    <div>
-                        Payment Plan
-                    </div>
-                    <div>
-                        Name
-                    </div>
+                    <div>Payment Plan</div>
+                    <div>Name</div>
                 </div>
             </ng-template>
 
             <ng-template #end>
                 <div>
+                    <p-buttonGroup>
+                        <p-button *ngIf="!editMode" label="Edit" [outlined]="true" (onClick)="editPaymentPlan()"></p-button>
+                        <p-button *ngIf="editMode" label="Cancel" [outlined]="true" (onClick)="cancelEdit()"></p-button>
+                        <p-button *ngIf="editMode" label="Save" [outlined]="true" (onClick)="savePaymentPlan()"></p-button>
+                        <p-button label="Preview" [outlined]="true" (onClick)="showPreview()"></p-button>
+                    </p-buttonGroup>
                 </div>
             </ng-template>
         </p-toolbar>
 
         <div class=" mb-6">
-            <p-table [value]="milestones()" dataKey="id"
-                     [expandedRowKeys]="expandedRows"
-                     responsiveLayout="scroll"
-                     [reorderableColumns]="true"
-                     (onRowReorder)="onRowReorder($event)"
-            >
+            <p-table [value]="milestones()" dataKey="id" [expandedRowKeys]="expandedRows" responsiveLayout="scroll" [reorderableColumns]="editMode" (onRowReorder)="onRowReorder($event)">
                 <ng-template #caption>
                     <div class="flex flex-col gap-2 w-full">
                         <div class="flex items-center justify-between gap-6 w-full">
                             <h5 class="m-0">Milestones</h5>
                             <div>
                                 <p-buttonGroup>
-                                    <p-button label="New Milestone" severity="secondary"
-                                              variant="outlined"
-                                              [disabled]="paymentPlanTotalPercent >= 100"
-                                              (onClick)="addMilestone()"
-                                    ></p-button>
-                                    <p-button label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}"
-                                              variant="outlined"
-                                              severity="secondary"
-                                              (onClick)="expandAll()"
-                                              icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"
-                                    ></p-button>
+                                    <p-button *ngIf="editMode" label="New Milestone" severity="secondary" variant="outlined" [disabled]="paymentPlanTotalPercent >= 100" (onClick)="addMilestone()"></p-button>
+                                    <p-button label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}" variant="outlined" severity="secondary" (onClick)="expandAll()" icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"></p-button>
                                 </p-buttonGroup>
                             </div>
                         </div>
                         <div>
-                            <p-progressbar [value]="paymentPlanTotalPercent" [showValue]="true"
-                                           [color]="progressColor"></p-progressbar>
+                            <p-progressbar [value]="paymentPlanTotalPercent" [showValue]="true" [color]="progressColor"></p-progressbar>
                         </div>
-
                     </div>
-
                 </ng-template>
                 <ng-template #header>
                     <tr>
+                        <th *ngIf="editMode" style="width: 3rem"></th>
                         <th style="width: 3rem"></th>
-                        <th style="width: 3rem"></th>
-                        <th>
-                            Name
-                        </th>
-                        <th style="text-align: center">
-                            Total Percent
-                        </th>
-                        <th style="text-align: center">
-                            Frequency
-                        </th>
-                        <th style="text-align: center">
-                            Percent Per Frequency
-                        </th>
-                        <th style="text-align: center">
-                            Interval
-                        </th>
-                        <th>
-                            Interval Type
-                        </th>
-                        <th style="width: 4rem"></th>
+                        <th>Name</th>
+                        <th style="text-align: center">Total Percent</th>
+                        <th style="text-align: center">Frequency</th>
+                        <th style="text-align: center">Percent Per Frequency</th>
+                        <th style="text-align: center">Interval</th>
+                        <th>Interval Type</th>
+                        <th *ngIf="editMode" style="width: 4rem"></th>
                     </tr>
                 </ng-template>
                 <ng-template #body let-milestone let-expanded="expanded" let-index="rowIndex">
-                    <tr [ngStyle]="{'fontWeight': 'bold', 'fontStyle': 'italic'}" [pReorderableRow]="index">
-                        <td>
+                    <tr [ngStyle]="{ fontWeight: 'bold', fontStyle: 'italic' }" [pReorderableRow]="index">
+                        <td *ngIf="editMode">
                             <span class="pi pi-bars" pReorderableRowHandle></span>
                         </td>
                         <td>
-                            <button type="button" pButton pRipple [pRowToggler]="milestone"
-                                    class="p-button-text p-button-rounded p-button-plain"
-                                    [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                            <button type="button" pButton pRipple [pRowToggler]="milestone" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                         </td>
-                        <td style="min-width: 12rem;">{{ milestone.name }}</td>
-                        <td style="min-width: 4rem; text-align: right">{{ milestone.totalPercent | number: '1.2' }}%
+                        <td style="min-width: 12rem;">
+                            <div class="flex items-center justify-start gap-4 " [pTooltip]="milestone.description" showDelay="500" hideDelay="300">
+                                {{ milestone.name }}
+                                <InfoCircleIcon *ngIf="milestone.description" />
+                            </div>
                         </td>
+                        <td style="min-width: 4rem; text-align: right">{{ milestone.totalPercent | number: '1.2' }}%</td>
                         <td style="min-width: 4rem; text-align: right">{{ milestone.frequency }}</td>
-                        <td style="min-width: 4rem; text-align: right">{{ milestone.percentPerFrequency | number: '1.2' }}
+                        <td style="min-width: 4rem; text-align: right">
+                            {{ milestone.percentPerFrequency | number: '1.2' }}
                             %
                         </td>
                         <td style="min-width: 8rem; text-align: right">{{ milestone.frequencyInterval }}</td>
                         <td style="min-width: 8rem;">{{ milestone.frequencyIntervalType }}</td>
-                        <td>
+                        <td *ngIf="editMode">
                             <div class="flex justify-end ">
-                                <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2"
-                                          [outlined]="true"
-                                          (onClick)="editMilestone(milestone)"
-                                />
-                                <p-button icon="pi pi-trash" severity="danger" [rounded]="true"
-                                          [outlined]="true"
-                                          (onClick)="deleteMilestone(milestone)"
-                                />
+                                <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2" [outlined]="true" (onClick)="editMilestone(milestone)" />
+                                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (onClick)="deleteMilestone(milestone)" />
                             </div>
                         </td>
                     </tr>
@@ -179,8 +154,7 @@ interface expandedRows {
                                     <ng-template #caption>
                                         <div class="flex items-center justify-between">
                                             <h6 class="m-0">{{ milestone.name }} Fees</h6>
-                                            <p-button label="New Fee" severity="secondary" variant="outlined"
-                                                      (onClick)="addMilestoneFee(milestone)"></p-button>
+                                            <p-button *ngIf="editMode" label="New Fee" severity="secondary" variant="outlined" (onClick)="addMilestoneFee(milestone)"></p-button>
                                         </div>
                                     </ng-template>
                                     <ng-template #header>
@@ -194,30 +168,23 @@ interface expandedRows {
                                             <th>Fixed Amount</th>
                                             <th>Rate</th>
                                             <th>Is Recurring</th>
-                                            <th style="width: 4rem"></th>
+                                            <th *ngIf="editMode" style="width: 4rem"></th>
                                         </tr>
                                     </ng-template>
                                     <ng-template #body let-fee>
                                         <tr>
                                             <td>{{ fee.name }}</td>
                                             <td>
-                                                <div *ngIf="fee.fixedAmount">AED {{ fee.fixedAmount| number: '1.2' }}
-                                                </div>
+                                                <div *ngIf="fee.fixedAmount">AED {{ fee.fixedAmount | number: '1.2' }}</div>
                                             </td>
                                             <td>
-                                                <div *ngIf="fee.rate"> {{ fee.rate  | number: '1.2' }}%</div>
+                                                <div *ngIf="fee.rate">{{ fee.rate | number: '1.2' }}%</div>
                                             </td>
                                             <td>{{ fee.isRecurring }}</td>
-                                            <td>
+                                            <td *ngIf="editMode">
                                                 <div class="flex justify-end ">
-                                                    <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2"
-                                                              [outlined]="true"
-                                                              (onClick)="editMilestoneFee(milestone, fee)"
-                                                    />
-                                                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true"
-                                                              [outlined]="true"
-                                                              (onClick)="deleteMilestoneFee(milestone, fee)"
-                                                    />
+                                                    <p-button icon="pi pi-pencil" [rounded]="true" class="mr-2" [outlined]="true" (onClick)="editMilestoneFee(milestone, fee)" />
+                                                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (onClick)="deleteMilestoneFee(milestone, fee)" />
                                                 </div>
                                             </td>
                                         </tr>
@@ -243,57 +210,46 @@ interface expandedRows {
         <p-dialog [(visible)]="milestoneDialog" [style]="{ width: '450px' }" header="Milestone Details" [modal]="true">
             <ng-template #content>
                 <p-fluid>
-
                     <div class="flex flex-col gap-6 w-full">
                         <div>
                             <label for="name" class="block font-bold mb-3">Name</label>
-                            <input type="text" pInputText id="name" [(ngModel)]="milestone.name" required autofocus
-                            />
+                            <input type="text" pInputText id="name" [(ngModel)]="milestone.name" required autofocus />
                             <small class="text-red-500" *ngIf="submitted && !milestone.name">Name is required.</small>
                         </div>
                         <div>
                             <label for="description" class="block font-bold mb-3">Description</label>
-                            <textarea id="description" pTextarea [(ngModel)]="milestone.description" rows="3"
-                                      cols="20" fluid></textarea>
+                            <textarea id="description" pTextarea [(ngModel)]="milestone.description" rows="3" cols="20" fluid></textarea>
                         </div>
                         <div class="flex flex-col md:flex-row gap-6">
                             <div class="flex flex-wrap w-full">
                                 <label for="totalPercent" class="block font-bold mb-3">Total Percent (%)</label>
-                                <p-inputnumber inputId="totalPercent" [(ngModel)]="milestone.totalPercent"
-                                ></p-inputnumber>
+                                <p-inputnumber inputId="totalPercent" [(ngModel)]="milestone.totalPercent"></p-inputnumber>
                             </div>
                             <div class="flex flex-wrap w-full">
                                 <label for="frequency" class="block font-bold mb-3">Frequency</label>
-                                <p-inputnumber inputId="frequency" [(ngModel)]="milestone.frequency"
-                                ></p-inputnumber>
+                                <p-inputnumber inputId="frequency" [(ngModel)]="milestone.frequency"></p-inputnumber>
                             </div>
                         </div>
                         <div class="flex flex-col md:flex-row gap-6">
                             <div class="flex flex-wrap w-full">
                                 <label for="interval" class="block font-bold mb-3">Interval</label>
-                                <p-inputnumber inputId="interval" [(ngModel)]="milestone.frequencyInterval"
-                                               [showButtons]="true"
-                                ></p-inputnumber>
+                                <p-inputnumber inputId="interval" [(ngModel)]="milestone.frequencyInterval" [showButtons]="true"></p-inputnumber>
                             </div>
                             <div class="flex flex-wrap w-full flex-col">
                                 <label for="intervalType" class="block font-bold mb-3">Interval Type</label>
-                                <p-select [(ngModel)]="milestone.frequencyIntervalType" inputId="intervalType"
-                                          [options]="intervalTypes"
-                                          optionLabel="label" optionValue="value" placeholder="Select a Interval Type"
-                                          fluid appendTo="body"/>
+                                <p-select [(ngModel)]="milestone.frequencyIntervalType" inputId="intervalType" [options]="intervalTypes" optionLabel="label" optionValue="value" placeholder="Select a Interval Type" fluid appendTo="body" />
                             </div>
                         </div>
                         <div>
                             <label for="remarks" class="block font-bold mb-3">Remarks</label>
-                            <textarea id="remarks" pTextarea [(ngModel)]="milestone.remarks" rows="3"
-                                      cols="20" fluid></textarea>
+                            <textarea id="remarks" pTextarea [(ngModel)]="milestone.remarks" rows="3" cols="20" fluid></textarea>
                         </div>
                     </div>
                 </p-fluid>
             </ng-template>
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()"/>
-                <p-button label="Save" icon="pi pi-check" (onClick)="saveMilestone()"/>
+                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (onClick)="saveMilestone()" />
             </ng-template>
         </p-dialog>
 
@@ -303,61 +259,94 @@ interface expandedRows {
                     <div class="flex flex-col gap-6 w-full">
                         <div>
                             <label for="name" class="block font-bold mb-3">Name</label>
-                            <input type="text" pInputText id="name" [(ngModel)]="fee.name" required autofocus
-                            />
+                            <input type="text" pInputText id="name" [(ngModel)]="fee.name" required autofocus />
                             <small class="text-red-500" *ngIf="submitted && !fee.name">Name is required.</small>
                         </div>
                         <div>
                             <label for="description" class="block font-bold mb-3">Description</label>
-                            <textarea id="description" pTextarea [(ngModel)]="fee.description" rows="3"
-                                      cols="20" fluid></textarea>
+                            <textarea id="description" pTextarea [(ngModel)]="fee.description" rows="3" cols="20" fluid></textarea>
                         </div>
 
-
                         <div class="flex flex-col md:flex-row gap-6">
-
                             <div class="flex flex-wrap w-full flex-col">
                                 <label for="intervalType" class="block font-bold mb-3">Interval Type</label>
-                                <p-select [(ngModel)]="feeType" inputId="intervalType"
-                                          [options]="feeTypes"
-                                          optionLabel="label" optionValue="value" placeholder="Select a Fee Type"
-                                          fluid appendTo="body"/>
+                                <p-select [(ngModel)]="feeType" inputId="intervalType" [options]="feeTypes" optionLabel="label" optionValue="value" placeholder="Select a Fee Type" fluid appendTo="body" />
                             </div>
                             <div class="flex flex-wrap w-full" *ngIf="feeType === 'fixed'">
                                 <label for="fixedAmount" class="block font-bold mb-3">Amount</label>
-                                <p-inputnumber inputId="fixedAmount" [(ngModel)]="fee.fixedAmount"
-                                               [disabled]="feeType !== 'fixed'"
-                                               mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"
-
-                                ></p-inputnumber>
+                                <p-inputnumber inputId="fixedAmount" [(ngModel)]="fee.fixedAmount" [disabled]="feeType !== 'fixed'" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
                             </div>
                             <div class="flex flex-wrap w-full" *ngIf="feeType === 'rate'">
                                 <label for="rate" class="block font-bold mb-3">Rate</label>
-                                <p-inputnumber inputId="rate" [(ngModel)]="fee.rate"
-                                               [disabled]="feeType !== 'rate'"
-                                               mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"
-
-                                ></p-inputnumber>
+                                <p-inputnumber inputId="rate" [(ngModel)]="fee.rate" [disabled]="feeType !== 'rate'" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
                             </div>
-
                         </div>
                     </div>
                 </p-fluid>
             </ng-template>
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()"/>
-                <p-button label="Save" icon="pi pi-check" (onClick)="saveFee()"/>
+                <p-button label="Cancel" icon="pi pi-times" text (onClick)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (onClick)="saveFee()" />
             </ng-template>
         </p-dialog>
 
+        <p-dialog [(visible)]="previewDialog" [style]="{ width: '80rem' }" header="Preview" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }">
+            <ng-template #content>
+                <p-fluid>
+                    <div class="flex flex-col gap-6 w-full">
+                        <div class="flex flex-col md:flex-row gap-2 w-full">
+                            <div class="flex flex-col w-full">
+                                <label for="price" class="block font-bold mb-3">Price</label>
+                                <p-inputnumber inputId="price" [(ngModel)]="previewPrice" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
+                            </div>
+                            <div class="flex flex-col w-full">
+                                <label for="price" class="block font-bold mb-3">Date</label>
+                                <p-datepicker [(ngModel)]="previewDate" appendTo="body" />
+                            </div>
+                        </div>
+                        <div>
+                            <p-table [value]="previewPaymentPlanData()" showGridlines="true">
+                                <ng-template #caption>
+                                    <p-button severity="secondary" label="Update" (onClick)="createPreviewTable()"></p-button>
+                                </ng-template>
+                                <ng-template #header>
+                                    <tr>
+                                        <th style="text-align: center; min-width: 12rem">Name</th>
+                                        <th style="text-align: center; min-width: 12rem">Percentage</th>
+                                        <th style="text-align: center; min-width: 12rem">Price</th>
+                                        <th style="text-align: center; min-width: 12rem">Remarks</th>
+                                        <th style="text-align: center; min-width: 12rem">Due Date</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template #body let-previewData>
+                                    <tr>
+                                        <td>{{ previewData.name }}</td>
+                                        <td style="text-align: right; padding-right: 2rem">
+                                            {{ previewData.percentage | number: '1.2' | prefixSuffix: '' : '%' }}
+                                        </td>
+                                        <td style="text-align: right; padding-right: 2rem">
+                                            {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
+                                        </td>
+                                        <td>{{ previewData.remarks }}</td>
+                                        <td>{{ previewData.dueDate | date: 'MMM dd,yyyy' }}</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+                </p-fluid>
+            </ng-template>
+            <ng-template #footer> </ng-template>
+        </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }"/>
+        <p-confirmdialog [style]="{ width: '450px' }" />
     `,
     providers: [PaymentplanService, MessageService, ConfirmationService]
 })
 export class PaymentplanEdit {
-
     record!: PaymentPlan;
+
+    recordId!: string | null;
 
     milestones = signal<Milestone[]>([]);
 
@@ -381,7 +370,15 @@ export class PaymentplanEdit {
 
     feeTypes: any[] = [];
 
-    recordId!: string | null;
+    previewDialog: boolean = false;
+
+    previewPrice: number = 7325897.97836;
+
+    previewDate: Date = new Date();
+
+    previewPaymentPlanData = signal<PaymentPlanPreview[]>([]);
+
+    editMode: boolean = false;
 
     private readonly route = inject(ActivatedRoute);
 
@@ -390,32 +387,48 @@ export class PaymentplanEdit {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private _location: Location
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
-
         this.recordId = this.route.snapshot.paramMap.get('id');
         if (this.recordId) {
             this.paymentplanService.getPaymentPlan(this.recordId).then((result) => {
                 this.record = result as PaymentPlan;
-                this.milestones.set(this.record.milestones ?? []);
+                this.milestones.set([...(this.record.milestones ?? [])]);
             });
+        } else {
+            this.editMode = true;
         }
 
         // this.loadDemoData();
 
         this.intervalTypes = [
-            {label: 'day', value: 'day'},
-            {label: 'week', value: 'week'},
-            {label: 'month', value: 'month'},
-            {label: 'year', value: 'year'},
+            { label: 'day', value: 'day' },
+            { label: 'week', value: 'week' },
+            { label: 'month', value: 'month' },
+            { label: 'year', value: 'year' }
         ];
 
         this.feeTypes = [
-            {label: 'Fixed Amount', value: 'fixed'},
-            {label: 'Rate', value: 'rate'},
-        ]
+            { label: 'Fixed Amount', value: 'fixed' },
+            { label: 'Rate', value: 'rate' }
+        ];
+    }
+
+    editPaymentPlan() {
+        this.editMode = true;
+    }
+
+    cancelEdit() {
+        this.milestones.set([...(this.record.milestones ?? [])]);
+        this.editMode = false;
+    }
+
+    savePaymentPlan() {
+        this.editMode = false;
+        if (this.recordId) {
+            this.record.milestones = [...this.milestones()];
+        }
     }
 
     goBack() {
@@ -438,15 +451,13 @@ export class PaymentplanEdit {
         this.isExpanded = !this.isExpanded;
     }
 
-
     onRowReorder(event: TableRowReorderEvent) {
         this.milestones().forEach((milestone, index) => {
-            milestone.order = index
+            milestone.order = index;
         });
     }
 
     addMilestoneFee(milestone: Milestone) {
-        console.log(milestone);
         this.fee = {};
         this.feeType = 'fixed';
         this.milestone = milestone;
@@ -504,12 +515,11 @@ export class PaymentplanEdit {
             this.milestoneDialog = false;
             this.milestone = {};
             this.submitted = false;
-
         }
     }
 
     editMilestone(record: Milestone) {
-        this.milestone = {...record};
+        this.milestone = { ...record };
         this.milestoneDialog = true;
     }
 
@@ -532,7 +542,7 @@ export class PaymentplanEdit {
 
     editMilestoneFee(milestone: Milestone, fee: MilestoneFee) {
         this.milestone = milestone;
-        this.fee = {...fee};
+        this.fee = { ...fee };
         this.feeType = this.fee.rate ? 'rate' : 'fixed';
         this.feeDialog = true;
     }
@@ -553,7 +563,7 @@ export class PaymentplanEdit {
             }
 
             if (this.fee.id) {
-                _fees[this.milestone.fees.findIndex(f => f.id === this.fee.id)] = this.fee;
+                _fees[this.milestone.fees.findIndex((f) => f.id === this.fee.id)] = this.fee;
                 // this.milestone.fees[this.findIndexById(this.fee.id)] = {...this.fee};
                 this.milestone.fees = [..._fees];
             } else {
@@ -574,7 +584,7 @@ export class PaymentplanEdit {
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                milestone.fees = (milestone.fees?.filter((val) => val.id !== fee.id));
+                milestone.fees = milestone.fees?.filter((val) => val.id !== fee.id);
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Successful',
@@ -585,10 +595,55 @@ export class PaymentplanEdit {
         });
     }
 
+    showPreview() {
+        this.previewDialog = true;
+        this.createPreviewTable();
+    }
+
+    createPreviewTable() {
+        const data: PaymentPlanPreview[] = [];
+        let date = new Date(this.previewDate);
+        this.milestones().forEach((milestone) => {
+            for (let i = 0; i < (milestone.frequency ?? 0); i++) {
+                let percentage = (milestone.totalPercent ?? 0) / (milestone.frequency ?? 1);
+                let price = this.previewPrice * (percentage / 100);
+                let remarks = '';
+                let name = milestone.name;
+
+                switch (milestone.frequencyIntervalType) {
+                    case 'day':
+                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    case 'week':
+                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0) * 7));
+                        break;
+                    case 'month':
+                        date = new Date(date.setMonth(date.getMonth() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    case 'year':
+                        date = new Date(date.setFullYear(date.getFullYear() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    default:
+                        break;
+                }
+
+                data.push({
+                    percentage: percentage,
+                    price: price,
+                    name: name,
+                    remarks: remarks,
+                    dueDate: new Date(date)
+                });
+            }
+        });
+
+        this.previewPaymentPlanData.set(data);
+    }
+
     get paymentPlanTotalPercent() {
         let total = 0;
-        this.milestones().forEach(milestone => {
-            total += (milestone.totalPercent ?? 0);
+        this.milestones().forEach((milestone) => {
+            total += milestone.totalPercent ?? 0;
         });
         return total;
     }

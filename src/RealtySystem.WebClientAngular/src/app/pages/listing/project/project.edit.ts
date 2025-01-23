@@ -257,7 +257,11 @@ interface ExportColumn {
                                     <td style="width: 3rem">
                                         <p-tableCheckbox [value]="record" />
                                     </td>
-                                    <td style="min-width: 16rem">{{ record.name }}</td>
+                                    <td style="min-width: 16rem">
+                                        <a [routerLink]="['/realty/listing/property/details/', record.id]" p-button variant="text">
+                                            {{ record.name }}
+                                        </a>
+                                    </td>
                                     <td style="min-width: 8rem">{{ record.type }}</td>
                                     <td>{{ record.price | number: '1.0-0' | prefixSuffix: 'AED' }}</td>
                                     <td>{{ record.totalArea | number: '1.0-0' | prefixSuffix: '' : 'ft&sup2;' }}</td>
@@ -265,8 +269,6 @@ interface ExportColumn {
 
                                     <td>
                                         <div class="flex flex-wrap justify-end mr-4">
-                                            <!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
-                                            <!--                                      (click)="editRecord(record)"/>-->
                                             <a [routerLink]="['/realty/listing/property/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
                                                 <SearchIcon pButtonIcon />
                                             </a>
