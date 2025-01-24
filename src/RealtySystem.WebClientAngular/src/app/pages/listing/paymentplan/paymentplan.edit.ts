@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Toolbar, ToolbarModule } from 'primeng/toolbar';
-import { Milestone, MilestoneFee, PaymentPlan, PaymentPlanPreview, PaymentplanService } from '../../service/paymentplan.service';
+import { Milestone, MilestoneFee, PaymentPlan, SchedulePlan, PaymentplanService } from '../../service/paymentplan.service';
 import { Button, ButtonDirective, ButtonModule } from 'primeng/button';
 import { CommonModule, CurrencyPipe, Location, NgIf } from '@angular/common';
 import { Rating, RatingModule } from 'primeng/rating';
@@ -328,7 +328,7 @@ interface expandedRows {
                                             {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
                                         </td>
                                         <td>{{ previewData.remarks }}</td>
-                                        <td>{{ previewData.dueDate | date: 'MMM dd,yyyy' }}</td>
+                                        <td style="text-align: center;">{{ previewData.dueDate | date: 'MMM dd, yyyy' }}</td>
                                     </tr>
                                 </ng-template>
                             </p-table>
@@ -376,7 +376,7 @@ export class PaymentplanEdit {
 
     previewDate: Date = new Date();
 
-    previewPaymentPlanData = signal<PaymentPlanPreview[]>([]);
+    previewPaymentPlanData = signal<SchedulePlan[]>([]);
 
     editMode: boolean = false;
 
@@ -605,7 +605,7 @@ export class PaymentplanEdit {
     }
 
     createPreviewTable() {
-        const data: PaymentPlanPreview[] = [];
+        const data: SchedulePlan[] = [];
         let date = new Date(this.previewDate);
         this.milestones().forEach((milestone) => {
             for (let i = 0; i < (milestone.frequency ?? 0); i++) {

@@ -32,7 +32,7 @@ export interface PaymentPlan {
     milestones?: Milestone[];
 }
 
-export interface PaymentPlanPreview {
+export interface SchedulePlan {
     name?: string | null;
     percentage?: number | null;
     price?: number | null;
@@ -65,7 +65,7 @@ export class PaymentplanService {
                         totalPercent: 10.0,
                         frequency: 1,
                         frequencyIntervalType: 'month',
-                        frequencyInterval: 1,
+                        frequencyInterval: 0,
                         percentPerFrequency: 10,
                         ordinalCountFromFrequency: 'start',
                         fees: [
@@ -164,16 +164,72 @@ export class PaymentplanService {
                 milestones: [
                     {
                         id: '1',
-                        name: 'Booking',
+                        name: 'Downpayment',
                         description: '',
                         remarks: '',
                         order: 1,
-                        totalPercent: 20.0,
+                        totalPercent: 10.0,
                         frequency: 1,
                         frequencyIntervalType: 'month',
                         frequencyInterval: 1,
-                        percentPerFrequency: 20.0,
+                        percentPerFrequency: 10.0,
                         ordinalCountFromFrequency: 'start',
+                        fees: []
+                    },
+                    {
+                        id: '2',
+                        name: 'After 3 Months',
+                        description: '',
+                        remarks: '',
+                        order: 2,
+                        totalPercent: 10.0,
+                        frequency: 1,
+                        frequencyIntervalType: 'month',
+                        frequencyInterval: 3,
+                        percentPerFrequency: 10.0,
+                        ordinalCountFromFrequency: 'continue',
+                        fees: []
+                    },
+                    {
+                        id: '3',
+                        name: 'Installment',
+                        description: '',
+                        remarks: '',
+                        order: 3,
+                        totalPercent: 22.0,
+                        frequency: 22,
+                        frequencyIntervalType: 'month',
+                        frequencyInterval: 3,
+                        percentPerFrequency: 1.0,
+                        ordinalCountFromFrequency: 'continue',
+                        fees: []
+                    },
+                    {
+                        id: '4',
+                        name: 'Handover',
+                        description: '',
+                        remarks: '',
+                        order: 4,
+                        totalPercent: 10.0,
+                        frequency: 1,
+                        frequencyIntervalType: 'month',
+                        frequencyInterval: 1,
+                        percentPerFrequency: 10.0,
+                        ordinalCountFromFrequency: 'continue',
+                        fees: []
+                    },
+                    {
+                        id: '5',
+                        name: 'Post-Handover',
+                        description: '',
+                        remarks: '',
+                        order: 5,
+                        totalPercent: 48.0,
+                        frequency: 48,
+                        frequencyIntervalType: 'month',
+                        frequencyInterval: 1,
+                        percentPerFrequency: 1.0,
+                        ordinalCountFromFrequency: 'continue',
                         fees: []
                     }
                 ]
