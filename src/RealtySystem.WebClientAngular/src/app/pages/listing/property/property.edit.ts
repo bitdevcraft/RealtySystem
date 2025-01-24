@@ -81,8 +81,8 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
             <p-tabs value="0" scrollable>
                 <p-tablist>
                     <p-tab value="0">Details</p-tab>
-                    <p-tab value="1">Marketing and Media</p-tab>
-                    <p-tab value="2">Documents</p-tab>
+                    <p-tab value="1" disabled>Marketing and Media</p-tab>
+                    <p-tab value="2" disabled>Documents</p-tab>
                 </p-tablist>
                 <p-tabpanels>
                     <p-tabpanel value="0">

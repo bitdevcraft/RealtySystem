@@ -1,3 +1,4 @@
+import { PaymentPlanPicklist } from './../../service/paymentplan.service';
 import { Component, ElementRef, inject, ModelSignal, signal, ViewChild } from '@angular/core';
 import { Project, ProjectService } from '../../service/project.service';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -22,6 +23,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Select, SelectModule } from 'primeng/select';
 import { SearchIcon } from 'primeng/icons';
+import { PickListModule } from 'primeng/picklist';
+import { PaymentplanService } from '../../service/paymentplan.service';
 
 interface Column {
     field: string;
@@ -57,7 +60,8 @@ interface ExportColumn {
         ConfirmDialog,
         SelectModule,
         FormsModule,
-        SearchIcon
+        SearchIcon,
+        PickListModule
     ],
     styles: `
         .parent-container .button-container {
@@ -92,7 +96,7 @@ interface ExportColumn {
                     <p-tab [value]="0">Details</p-tab>
                     <p-tab [value]="1">Properties</p-tab>
                     <p-tab [value]="2">Payment Plans</p-tab>
-                    <p-tab [value]="3">Marketing and Media</p-tab>
+                    <p-tab [value]="3" disabled>Marketing and Media</p-tab>
                 </p-tablist>
                 <p-tabpanels>
                     <p-tabpanel [value]="0">
@@ -279,7 +283,54 @@ interface ExportColumn {
                             </ng-template>
                         </p-table>
                     </p-tabpanel>
-                    <p-tabpanel [value]="2"> </p-tabpanel>
+                    <p-tabpanel [value]="2">
+                        <p-fieldset legend="Payment Plan List" [toggleable]="true">
+                            <div *ngIf="editPaymentPlan">
+                                <div class="mb-4">
+                                    <p-pick-list [source]="sourcePaymentPlans" [target]="targetPaymentPlans" breakpoint="1400px">
+                                        <ng-template #sourceHeader>
+                                            <div class="font-bold text-l text-primary">Available</div>
+                                        </ng-template>
+                                        <ng-template #targetHeader>
+                                            <div class="font-bold text-l text-primary">Selected</div>
+                                        </ng-template>
+                                        <ng-template #item let-item>
+                                            {{ item.name }}
+                                        </ng-template>
+                                    </p-pick-list>
+                                </div>
+                                <div class="text-center">
+                                    <p-button label="Cancel" [text]="true" icon="pi pi-times" (onClick)="cancelEditPaymentPlan()" severity="danger"></p-button>
+                                    <p-button label="Save" [outlined]="true" (onClick)="savePaymentPlan()"></p-button>
+                                </div>
+                            </div>
+                            <div *ngIf="!editPaymentPlan">
+                                <p-table [value]="targetPaymentPlans">
+                                    <ng-template #header>
+                                        <tr>
+                                            <th>
+                                                <div class="flex justify-between items-center">
+                                                    <div>List</div>
+                                                    <div>
+                                                        <p-button label="Edit" size="small" severity="secondary" icon="pi pi-pencil" (onClick)="editPaymentPlanRecord()"></p-button>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template #body let-record>
+                                        <tr>
+                                            <td>
+                                                <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" class="mr-2" pButton text="true">
+                                                    {{ record.name }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </p-fieldset>
+                    </p-tabpanel>
                     <p-tabpanel [value]="3"> </p-tabpanel>
                 </p-tabpanels>
             </p-tabs>
@@ -287,7 +338,7 @@ interface ExportColumn {
 
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
-    providers: [CommunityService, ProjectService, ConfirmationService, MessageService]
+    providers: [CommunityService, ProjectService, ConfirmationService, MessageService, PaymentplanService]
 })
 export class ProjectEdit {
     record = signal<Project>({});
@@ -299,6 +350,8 @@ export class ProjectEdit {
     autoFilteredValue: any[] = [];
 
     editMode: boolean = false;
+
+    editPaymentPlan: boolean = false;
 
     submitted: boolean = false;
 
@@ -316,6 +369,12 @@ export class ProjectEdit {
 
     queryParams: any;
 
+    sourcePaymentPlans: any[] = [];
+
+    targetPaymentPlans: any[] = [];
+
+    paymentPlanPicklist!: PaymentPlanPicklist;
+
     private readonly route = inject(ActivatedRoute);
 
     constructor(
@@ -324,6 +383,7 @@ export class ProjectEdit {
         private messageService: MessageService,
         private projectService: ProjectService,
         private propertyService: PropertyService,
+        private paymentPlanService: PaymentplanService,
         private router: Router,
         private _location: Location,
         private fb: FormBuilder
@@ -351,7 +411,14 @@ export class ProjectEdit {
             });
         } else {
             this.editMode = true;
+            this.editPaymentPlan = true;
         }
+
+        this.paymentPlanService.getPaymentPlanByProject(this.recordId).then((result) => {
+            this.paymentPlanPicklist = result;
+            this.sourcePaymentPlans = [...result.source];
+            this.targetPaymentPlans = [...result.target];
+        });
 
         this.route.queryParams.subscribe((params) => {
             this.queryParams = params;
@@ -392,6 +459,23 @@ export class ProjectEdit {
             alert('Form Submitted succesfully!!!\n Check the values in browser console.');
             console.table(this.recordForm.value);
         }
+    }
+
+    editPaymentPlanRecord() {
+        this.editPaymentPlan = true;
+    }
+
+    cancelEditPaymentPlan() {
+        this.editPaymentPlan = false;
+        this.sourcePaymentPlans = [...this.paymentPlanPicklist.source];
+        this.targetPaymentPlans = [...this.paymentPlanPicklist.target];
+    }
+
+    savePaymentPlan() {
+        this.paymentPlanPicklist.source = [...this.sourcePaymentPlans];
+        this.paymentPlanPicklist.target = [...this.targetPaymentPlans];
+
+        this.editPaymentPlan = false;
     }
 
     editRecord() {

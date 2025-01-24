@@ -40,6 +40,11 @@ export interface PaymentPlanPreview {
     remarks?: string | null;
 }
 
+export interface PaymentPlanPicklist {
+    source: PaymentPlan[];
+    target: PaymentPlan[];
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -200,6 +205,17 @@ export class PaymentplanService {
 
     getPaymentPlan(id: string) {
         return Promise.resolve(this.getData().find((p) => p.id === id));
+    }
+
+    getPaymentPlanByProject(projectId?: string | null) {
+        let source = this.getData();
+
+        let target = projectId ? this.getData().slice(0, 1) : [];
+
+        return Promise.resolve({
+            source: source.filter((a) => !target.some((b) => a.id === b.id)),
+            target: target
+        });
     }
 
     constructor() {}
