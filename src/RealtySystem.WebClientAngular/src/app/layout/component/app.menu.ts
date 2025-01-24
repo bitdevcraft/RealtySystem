@@ -95,11 +95,13 @@ export class AppMenu {
                         items: [
                             {
                                 label: 'List View',
-                                icon: 'pi pi-fw pi-list'
+                                icon: 'pi pi-fw pi-list',
+                                routerLink: ['realty', 'booking']
                             },
                             {
                                 label: 'New',
-                                icon: 'pi pi-fw pi-plus'
+                                icon: 'pi pi-fw pi-plus',
+                                routerLink: ['realty', 'booking', 'new']
                             }
                         ]
                     }
@@ -120,11 +122,6 @@ export class AppMenu {
                 ]
             },
             {
-                label: 'Services',
-                items: []
-            },
-
-            {
                 label: 'Administration',
                 items: [
                     {
@@ -144,6 +141,29 @@ export class AppMenu {
                                 icon: 'pi pi-fw'
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                label: 'Pages',
+                items: [
+                    {
+                        label: 'Home'
+                    },
+                    {
+                        label: 'About'
+                    },
+                    {
+                        label: 'Properties'
+                    },
+                    {
+                        label: 'Property'
+                    },
+                    {
+                        label: 'Projects'
+                    },
+                    {
+                        label: 'Project'
                     }
                 ]
             },
