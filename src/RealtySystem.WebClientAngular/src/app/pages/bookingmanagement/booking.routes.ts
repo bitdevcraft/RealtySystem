@@ -5,15 +5,15 @@ import { BookingEdit } from './booking/booking.edit';
 
 export default [
     {
-        path: 'booking',
+        path: '',
         component: BookingView
     },
     {
-        path: 'booking/new',
+        path: 'new',
         component: BookingNew
     },
     {
-        path: 'booking/details/:id',
+        path: 'details/:id',
         component: BookingEdit
     }
 ] as Routes;

@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <p>
-      booking works!
+      booking edit works!
     </p>
   `
 })

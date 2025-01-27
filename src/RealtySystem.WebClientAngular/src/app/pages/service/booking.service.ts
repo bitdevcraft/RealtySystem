@@ -20,6 +20,7 @@ export interface Booking {
     mainBuyerId?: string | null;
     coBuyers?: [] | null;
 
+    bookingDate?: Date | null;
     status?: string | null;
     schedulePlan?: SchedulePlan[] | null;
     salePrice?: number | null;
