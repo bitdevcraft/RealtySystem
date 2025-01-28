@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Project } from './project.service';
 import { Address } from './interface/address';
 import { IForm, ToFormControls } from './type/IForm';
+import { FilterCriterion, GenericService, MatchType } from './generic.service';
 
 export interface Feature {
     name?: string | null;
@@ -2246,6 +2247,8 @@ export class PropertyService {
         ];
     }
 
+    genericService = inject(GenericService);
+
     constructor() {}
 
     getPropertiesMini() {
@@ -2274,5 +2277,10 @@ export class PropertyService {
 
     getPropertyByProject(projectId: string) {
         return Promise.resolve(this.getData().slice(0, 10));
+    }
+
+    getFilteredProperty(criteria: FilterCriterion<Property>[], matchType: MatchType) {
+        const data = this.genericService.filterWithOperators(this.getData(), criteria, matchType);
+        return Promise.resolve(data);
     }
 }
