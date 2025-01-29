@@ -268,17 +268,13 @@ interface expandedRows {
                         </div>
 
                         <div class="flex flex-col md:flex-row gap-6">
-                            <div class="flex flex-wrap w-full flex-col">
-                                <label for="intervalType" class="block font-bold mb-3">Interval Type</label>
-                                <p-select [(ngModel)]="feeType" inputId="intervalType" [options]="feeTypes" optionLabel="label" optionValue="value" placeholder="Select a Fee Type" fluid appendTo="body" />
-                            </div>
-                            <div class="flex flex-wrap w-full" *ngIf="feeType === 'fixed'">
+                            <div class="flex flex-wrap w-full">
                                 <label for="fixedAmount" class="block font-bold mb-3">Amount</label>
-                                <p-inputnumber inputId="fixedAmount" [(ngModel)]="fee.fixedAmount" [disabled]="feeType !== 'fixed'" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
+                                <p-inputnumber inputId="fixedAmount" [(ngModel)]="fee.fixedAmount" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
                             </div>
-                            <div class="flex flex-wrap w-full" *ngIf="feeType === 'rate'">
+                            <div class="flex flex-wrap w-full">
                                 <label for="rate" class="block font-bold mb-3">Rate</label>
-                                <p-inputnumber inputId="rate" [(ngModel)]="fee.rate" [disabled]="feeType !== 'rate'" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
+                                <p-inputnumber inputId="rate" [(ngModel)]="fee.rate" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="5"></p-inputnumber>
                             </div>
                         </div>
                     </div>
@@ -301,13 +297,13 @@ interface expandedRows {
                             </div>
                             <div class="flex flex-col w-full">
                                 <label for="price" class="block font-bold mb-3">Sample Date</label>
-                                <p-datepicker [(ngModel)]="previewDate" appendTo="body" />
+                                <p-datepicker [(ngModel)]="previewDate" appendTo="body"></p-datepicker>
                             </div>
                         </div>
                         <div>
                             <p-table [value]="previewPaymentPlanData()" showGridlines="true" [scrollable]="true" scrollHeight="500px">
                                 <ng-template #caption>
-                                    <p-button severity="secondary" label="Update" (onClick)="createPreviewTable()"></p-button>
+                                    <p-button [outlined]="true" label="Update" (onClick)="createPreviewTable()"></p-button>
                                 </ng-template>
                                 <ng-template #header>
                                     <tr>
@@ -336,10 +332,10 @@ interface expandedRows {
                     </div>
                 </p-fluid>
             </ng-template>
-            <ng-template #footer> </ng-template>
+            <ng-template #footer></ng-template>
         </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }" />
+        <p-confirmdialog [style]="{ width: '450px' }"></p-confirmdialog>
     `,
     providers: [PaymentplanService, MessageService, ConfirmationService]
 })
@@ -365,8 +361,6 @@ export class PaymentplanEdit {
     submitted: boolean = false;
 
     intervalTypes: any[] = [];
-
-    feeType: string = 'fixed';
 
     feeTypes: any[] = [];
 
@@ -459,7 +453,6 @@ export class PaymentplanEdit {
 
     addMilestoneFee(milestone: Milestone) {
         this.fee = {};
-        this.feeType = 'fixed';
         this.milestone = milestone;
         this.feeDialog = true;
     }
@@ -543,7 +536,6 @@ export class PaymentplanEdit {
     editMilestoneFee(milestone: Milestone, fee: MilestoneFee) {
         this.milestone = milestone;
         this.fee = { ...fee };
-        this.feeType = this.fee.rate ? 'rate' : 'fixed';
         this.feeDialog = true;
     }
 
@@ -554,12 +546,6 @@ export class PaymentplanEdit {
         if (this.fee.name?.trim()) {
             if (!this.milestone.fees) {
                 this.milestone.fees = [];
-            }
-
-            if (this.feeType === 'fixed') {
-                this.fee.rate = null;
-            } else if (this.feeType === 'rate') {
-                this.fee.fixedAmount = null;
             }
 
             if (this.fee.id) {
@@ -605,43 +591,7 @@ export class PaymentplanEdit {
     }
 
     createPreviewTable() {
-        const data: SchedulePlan[] = [];
-        let date = new Date(this.previewDate);
-        this.milestones().forEach((milestone) => {
-            for (let i = 0; i < (milestone.frequency ?? 0); i++) {
-                let percentage = (milestone.totalPercent ?? 0) / (milestone.frequency ?? 1);
-                let price = this.previewPrice * (percentage / 100);
-                let remarks = '';
-                let name = milestone.name;
-
-                switch (milestone.frequencyIntervalType) {
-                    case 'day':
-                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0)));
-                        break;
-                    case 'week':
-                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0) * 7));
-                        break;
-                    case 'month':
-                        date = new Date(date.setMonth(date.getMonth() + (milestone.frequencyInterval ?? 0)));
-                        break;
-                    case 'year':
-                        date = new Date(date.setFullYear(date.getFullYear() + (milestone.frequencyInterval ?? 0)));
-                        break;
-                    default:
-                        break;
-                }
-
-                data.push({
-                    percentage: percentage,
-                    price: price,
-                    name: name,
-                    remarks: remarks,
-                    dueDate: new Date(date)
-                });
-            }
-        });
-
-        this.previewPaymentPlanData.set(data);
+        this.previewPaymentPlanData.set(this.paymentplanService.generateSchedulePlan(this.milestones(), this.previewPrice, this.previewDate));
     }
 
     get paymentPlanTotalPercent() {

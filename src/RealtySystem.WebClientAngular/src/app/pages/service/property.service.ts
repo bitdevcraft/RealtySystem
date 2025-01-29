@@ -44,6 +44,9 @@ export class PropertyService {
                 ratePerArea: 1822.19,
                 rooms: 7,
                 listing: 'Sale',
+                project: {
+                    name: 'Grand Palm Resorts',
+                },
                 address: {
                     country: 'United Arab Emirates'
                 },

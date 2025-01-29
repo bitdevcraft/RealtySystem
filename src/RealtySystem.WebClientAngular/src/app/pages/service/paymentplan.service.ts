@@ -40,6 +40,12 @@ export interface SchedulePlan {
     remarks?: string | null;
 }
 
+export interface Fee {
+    name?: string | null;
+    price?: number | null;
+    remarks?: string | null;
+}
+
 export interface PaymentPlanPicklist {
     source: PaymentPlan[];
     target: PaymentPlan[];
@@ -174,7 +180,17 @@ export class PaymentplanService {
                         frequencyInterval: 1,
                         percentPerFrequency: 10.0,
                         ordinalCountFromFrequency: 'start',
-                        fees: []
+                        fees: [
+                            {
+                                id: 'Fee-3',
+                                name: 'Municipality Fee',
+                                description: '4% + 40',
+                                fixedAmount: 40,
+                                rate: 4,
+                                isRecurring: false,
+                                frequency: 1
+                            }
+                        ]
                     },
                     {
                         id: '2',
@@ -272,6 +288,70 @@ export class PaymentplanService {
             source: source.filter((a) => !target.some((b) => a.id === b.id)),
             target: target
         });
+    }
+
+    generateSchedulePlan(milestones: Milestone[], purchasePrice: number, startDate: Date) {
+        const data: SchedulePlan[] = [];
+        let date = new Date(startDate);
+        milestones.forEach((milestone) => {
+            for (let i = 0; i < (milestone.frequency ?? 0); i++) {
+                let percentage = (milestone.totalPercent ?? 0) / (milestone.frequency ?? 1);
+                let price = purchasePrice * (percentage / 100);
+                let remarks = '';
+                let name = milestone.name;
+
+                switch (milestone.frequencyIntervalType) {
+                    case 'day':
+                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    case 'week':
+                        date = new Date(date.setDate(date.getDate() + (milestone.frequencyInterval ?? 0) * 7));
+                        break;
+                    case 'month':
+                        date = new Date(date.setMonth(date.getMonth() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    case 'year':
+                        date = new Date(date.setFullYear(date.getFullYear() + (milestone.frequencyInterval ?? 0)));
+                        break;
+                    default:
+                        break;
+                }
+
+                data.push({
+                    percentage: percentage,
+                    price: price,
+                    name: name,
+                    remarks: remarks,
+                    dueDate: new Date(date)
+                });
+            }
+        });
+
+        return data;
+    }
+
+    generateFees(milestones: Milestone[], purchasePrice: number) {
+        const data: Fee[] = [];
+        milestones.forEach((milestone) => {
+            milestone?.fees?.forEach((fee) => {
+                let price = 0;
+                if (fee.rate) {
+                    price += (fee.rate * purchasePrice) / 100;
+                }
+
+                if (fee.fixedAmount) {
+                    price += fee.fixedAmount;
+                }
+
+                data.push({
+                    name: fee.name,
+                    price: price,
+                    remarks: fee.description
+                });
+            });
+        });
+
+        return data;
     }
 
     constructor() {}
