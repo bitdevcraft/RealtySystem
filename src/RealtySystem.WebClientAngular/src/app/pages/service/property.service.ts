@@ -53,11 +53,11 @@ export class PropertyService {
     }
 
     getPropertiesWithProject(): Observable<Property[]> {
-        return this.http.get<Property[]>(`${this.apiUrl}?_embed=project`);
+        return this.http.get<Property[]>(`${this.apiUrl}?_expand=project`);
     }
 
     getPropertyById(id: string) {
-        return this.http.get<Property>(`${this.apiUrl}/${id}?_embed=project`);
+        return this.http.get<Property>(`${this.apiUrl}/${id}?_expand=project`);
     }
 
     getPropertyByProject(projectId: string) {

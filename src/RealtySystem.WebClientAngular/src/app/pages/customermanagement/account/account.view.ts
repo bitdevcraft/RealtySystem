@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'account-view',
-  imports: [],
-  template: `
-    <p>
-      account works!
-    </p>
-  `
+    selector: 'account-view',
+    imports: [],
+    template: ` <p>account works!</p> `
 })
-export class AccountView {
-
-}
+export class AccountView {}

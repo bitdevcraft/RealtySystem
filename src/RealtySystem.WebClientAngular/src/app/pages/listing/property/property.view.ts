@@ -1,4 +1,4 @@
-import { Component, ElementRef, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { Table, TableModule } from 'primeng/table';
@@ -233,7 +233,7 @@ interface ExportColumn {
     `,
     providers: [MessageService, ConfirmationService, ProjectService, CountryService, CommunityService, PropertyService]
 })
-export class PropertyView {
+export class PropertyView implements OnInit {
     recordDialog: boolean = false;
 
     records = signal<Property[]>([]);

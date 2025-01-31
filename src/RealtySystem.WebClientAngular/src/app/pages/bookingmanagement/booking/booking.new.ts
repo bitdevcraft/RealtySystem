@@ -5,8 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
 import { Property, PropertyService } from '../../service/property.service';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { DatePipe, DecimalPipe, NgClass, NgForOf, NgIf } from '@angular/common';
-import { ProductService } from '../../service/product.service';
+import { DecimalPipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 import { Select } from 'primeng/select';
@@ -113,7 +112,7 @@ import { ScrollTopModule } from 'primeng/scrolltop';
                                         <div class="flex flex-col gap-4 w-[12rem] ">
                                             <p-select [(ngModel)]="matchValue" [options]="matchTypeOption" optionLabel="name" optionValue="code" placeholder="Select match type" fluid></p-select>
                                             <p-select [(ngModel)]="numberOperatorValue" [options]="numberOperator" optionLabel="name" optionValue="code" placeholder="operator" fluid></p-select>
-                                            <p-inputNumber [(ngModel)]="numberValue" fluid [showButtons]="true"></p-inputNumber>
+                                            <p-inputNumber [(ngModel)]="numberValue" fluid [showButtons]="true" [min]="0"></p-inputNumber>
                                             <div class="flex flex-row justify-between">
                                                 <p-button size="small" label="Apply" fluid (onClick)="addRoomFilter($event)"></p-button>
                                             </div>

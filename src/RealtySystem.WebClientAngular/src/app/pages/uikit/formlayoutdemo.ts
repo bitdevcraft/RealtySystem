@@ -10,7 +10,7 @@ import { TextareaModule } from 'primeng/textarea';
     selector: 'app-formlayout-demo',
     standalone: true,
     imports: [InputTextModule, FluidModule, ButtonModule, SelectModule, FormsModule, TextareaModule],
-    template: `<p-fluid>
+    template: ` <p-fluid>
         <div class="flex flex-col md:flex-row gap-8">
             <div class="md:w-1/2">
                 <div class="card flex flex-col gap-4">

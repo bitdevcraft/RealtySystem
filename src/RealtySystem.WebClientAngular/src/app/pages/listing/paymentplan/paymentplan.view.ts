@@ -1,4 +1,4 @@
-import { Component, ElementRef, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { Table, TableModule } from 'primeng/table';
@@ -173,7 +173,7 @@ interface ExportColumn {
     `,
     providers: [MessageService, ConfirmationService, CountryService, CommunityService, PaymentplanService]
 })
-export class PaymentplanView {
+export class PaymentplanView implements OnInit {
     recordDialog: boolean = false;
 
     records = signal<PaymentPlan[]>([]);

@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'contact-edit',
-  imports: [],
-  template: `
-    <p>
-      contact works!
-    </p>
-  `
+    selector: 'contact-edit',
+    imports: [],
+    template: ` <p>contact works!</p> `
 })
-export class ContactEdit {
-
-}
+export class ContactEdit {}

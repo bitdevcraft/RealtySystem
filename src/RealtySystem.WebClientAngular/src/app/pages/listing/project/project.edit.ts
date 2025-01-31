@@ -1,5 +1,5 @@
 import { PaymentPlanPicklist } from './../../service/paymentplan.service';
-import { Component, ElementRef, inject, ModelSignal, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ModelSignal, OnInit, signal, ViewChild } from '@angular/core';
 import { Project, ProjectService } from '../../service/project.service';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
@@ -340,7 +340,7 @@ interface ExportColumn {
     `,
     providers: [CommunityService, ProjectService, ConfirmationService, MessageService, PaymentplanService]
 })
-export class ProjectEdit {
+export class ProjectEdit implements OnInit {
     record = signal<Project>({});
 
     recordId!: string | null;

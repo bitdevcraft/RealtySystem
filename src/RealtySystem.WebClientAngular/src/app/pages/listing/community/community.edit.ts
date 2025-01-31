@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'community-edit',
-  imports: [],
-  template: `
-    <p>
-      community works!
-    </p>
-  `
+    selector: 'community-edit',
+    imports: [],
+    template: ` <p>community works!</p> `
 })
-export class CommunityEdit {
-
-}
+export class CommunityEdit {}

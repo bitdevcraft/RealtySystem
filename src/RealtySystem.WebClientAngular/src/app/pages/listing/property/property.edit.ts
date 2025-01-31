@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FieldsetModule } from 'primeng/fieldset';
 import { AccordionModule } from 'primeng/accordion';
 import { Button, ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
@@ -65,8 +65,7 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <div>
-                    <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2"
-                              (onClick)="goBack()"></p-button>
+                    <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2 pt-0">
                     <div class="text-sm text-surface-500 dark:text-surface-400">Property</div>
@@ -95,22 +94,15 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                 <div class="flex flex-col md:flex-row gap-6">
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <label class="font-bold" for="name">Name</label>
-                                                        <input pInputText id="name" type="text" formControlName="name"
-                                                               *ngIf="editMode" />
-                                                        <small class="text-red-500"
-                                                               *ngIf="propertyFormControl['name'].invalid && (propertyFormControl['name'].dirty || propertyFormControl['name'].touched)">Name
-                                                            is required.</small>
+                                                        <input pInputText id="name" type="text" formControlName="name" *ngIf="editMode" />
+                                                        <small class="text-red-500" *ngIf="propertyFormControl['name'].invalid && (propertyFormControl['name'].dirty || propertyFormControl['name'].touched)">Name is required.</small>
 
-                                                        <div
-                                                            class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                            *ngIf="!editMode">
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.name }}
                                                             </div>
                                                             <div class="button-container">
-                                                                <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                          [rounded]="true" severity="secondary"
-                                                                          (onClick)="editRecord()"></p-button>
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -126,16 +118,12 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                             *ngIf="editMode"
                                                         ></p-autocomplete>
 
-                                                        <div
-                                                            class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                            *ngIf="!editMode">
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.project?.name }}
                                                             </div>
                                                             <div class="button-container">
-                                                                <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                          [rounded]="true" severity="secondary"
-                                                                          (onClick)="editRecord()"></p-button>
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -153,56 +141,40 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                             appendTo="body"
                                                         ></p-select>
 
-                                                        <div
-                                                            class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                            *ngIf="!editMode">
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.status }}
                                                             </div>
                                                             <div class="button-container">
-                                                                <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                          [rounded]="true" severity="secondary"
-                                                                          (onClick)="editRecord()"></p-button>
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-wrap">
                                                     <label class="font-bold" for="description">Description</label>
-                                                    <textarea pTextarea id="description" rows="4"
-                                                              formControlName="description" *ngIf="editMode"></textarea>
+                                                    <textarea pTextarea id="description" rows="4" formControlName="description" *ngIf="editMode"></textarea>
 
-                                                    <div
-                                                        class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                        *ngIf="!editMode">
+                                                    <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                         <div>
                                                             {{ propertyValue.description }}
                                                         </div>
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                      [rounded]="true" severity="secondary"
-                                                                      (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-col md:flex-row gap-6">
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <label class="font-bold" for="type">Property Type</label>
-                                                        <p-select id="type" formControlName="type" *ngIf="editMode"
-                                                                  [options]="propertyTypes" optionLabel="name"
-                                                                  optionValue="code" placeholder="Select Type"
-                                                                  class="w-full" appendTo="body"></p-select>
+                                                        <p-select id="type" formControlName="type" *ngIf="editMode" [options]="propertyTypes" optionLabel="name" optionValue="code" placeholder="Select Type" class="w-full" appendTo="body"></p-select>
 
-                                                        <div
-                                                            class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                            *ngIf="!editMode">
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.type }}
                                                             </div>
                                                             <div class="button-container">
-                                                                <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                          [rounded]="true" severity="secondary"
-                                                                          (onClick)="editRecord()"></p-button>
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -220,16 +192,12 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                             appendTo="body"
                                                         ></p-select>
 
-                                                        <div
-                                                            class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                            *ngIf="!editMode">
+                                                        <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                             <div>
                                                                 {{ propertyValue.listing }}
                                                             </div>
                                                             <div class="button-container">
-                                                                <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                          [rounded]="true" severity="secondary"
-                                                                          (onClick)="editRecord()"></p-button>
+                                                                <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -246,19 +214,16 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                             <div class=" flex flex-col gap-6 w-full" *ngIf="editMode">
                                                 <div class="flex flex-wrap">
                                                     <label class="font-bold" for="street">Street</label>
-                                                    <input pInputText id="street" type="text"
-                                                           formControlName="street" />
+                                                    <input pInputText id="street" type="text" formControlName="street" />
                                                 </div>
                                                 <div class="flex flex-col md:flex-row gap-6">
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <label class="font-bold" for="city">City</label>
-                                                        <input pInputText id="city" type="text"
-                                                               formControlName="city" />
+                                                        <input pInputText id="city" type="text" formControlName="city" />
                                                     </div>
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <label class="font-bold" for="state">State</label>
-                                                        <input pInputText id="state" type="text"
-                                                               formControlName="state" />
+                                                        <input pInputText id="state" type="text" formControlName="state" />
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-col md:flex-row gap-6">
@@ -279,24 +244,14 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                     </div>
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <label class="font-bold" for="postal">Postal Code</label>
-                                                        <input pInputText id="postal" type="text"
-                                                               formControlName="postalCode" />
+                                                        <input pInputText id="postal" type="text" formControlName="postalCode" />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div
-                                                class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                *ngIf="!editMode">
-                                                <div>{{ propertyValue.address.street }}
-                                                    , {{ propertyValue.address.city }}
-                                                    , {{ propertyValue.address.state }}
-                                                    , {{ propertyValue.address.country }}
-                                                    , {{ propertyValue.address.postalCode }}
-                                                </div>
+                                            <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
+                                                <div>{{ propertyValue.address.street }} , {{ propertyValue.address.city }} , {{ propertyValue.address.state }} , {{ propertyValue.address.country }} , {{ propertyValue.address.postalCode }}</div>
                                                 <div class="button-container">
-                                                    <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                              [rounded]="true" severity="secondary"
-                                                              (onClick)="editRecord()"></p-button>
+                                                    <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                 </div>
                                             </div>
                                         </div>
@@ -311,45 +266,28 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                 <div class="flex flex-col md:flex-row gap-6">
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <div class="flex flex-wrap gap-2 w-full">
-                                                            <label class="font-bold" for="originalPrice">Original
-                                                                Price</label>
-                                                            <p-inputnumber id="originalPrice" mode="currency"
-                                                                           *ngIf="editMode"
-                                                                           formControlName="originalPrice"
-                                                                           currency="AED"></p-inputnumber>
+                                                            <label class="font-bold" for="originalPrice">Original Price</label>
+                                                            <p-inputnumber id="originalPrice" mode="currency" *ngIf="editMode" formControlName="originalPrice" currency="AED"></p-inputnumber>
 
-                                                            <div
-                                                                class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                                *ngIf="!editMode">
+                                                            <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                                 <div>
                                                                     {{ propertyValue.originalPrice | currency: 'AED ' }}
                                                                 </div>
                                                                 <div class="button-container">
-                                                                    <p-button icon="pi pi-pencil" [text]="true"
-                                                                              size="small" [rounded]="true"
-                                                                              severity="secondary"
-                                                                              (onClick)="editRecord()"></p-button>
+                                                                    <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-wrap gap-2 w-full">
-                                                            <label class="font-bold" for="listingPrice">Listing
-                                                                Price</label>
-                                                            <p-inputnumber inputId="listingPrice" mode="currency"
-                                                                           *ngIf="editMode" formControlName="price"
-                                                                           currency="AED"></p-inputnumber>
+                                                            <label class="font-bold" for="listingPrice">Listing Price</label>
+                                                            <p-inputnumber inputId="listingPrice" mode="currency" *ngIf="editMode" formControlName="price" currency="AED"></p-inputnumber>
 
-                                                            <div
-                                                                class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                                *ngIf="!editMode">
+                                                            <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                                 <div>
                                                                     {{ propertyValue.price | currency: 'AED ' }}
                                                                 </div>
                                                                 <div class="button-container">
-                                                                    <p-button icon="pi pi-pencil" [text]="true"
-                                                                              size="small" [rounded]="true"
-                                                                              severity="secondary"
-                                                                              (onClick)="editRecord()"></p-button>
+                                                                    <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -357,40 +295,27 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                     <div class="flex flex-wrap gap-2 w-full">
                                                         <div class="flex flex-wrap gap-2 w-full">
                                                             <label class="font-bold" for="totalArea">Total Area (ft<sup>2</sup>)</label>
-                                                            <p-inputnumber inputId="totalArea" *ngIf="editMode"
-                                                                           formControlName="totalArea"></p-inputnumber>
+                                                            <p-inputnumber inputId="totalArea" *ngIf="editMode" formControlName="totalArea"></p-inputnumber>
 
-                                                            <div
-                                                                class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                                *ngIf="!editMode">
+                                                            <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                                 <div>
                                                                     {{ propertyValue.totalArea | prefixSuffix: '' : 'ft&sup2;' }}
                                                                 </div>
                                                                 <div class="button-container">
-                                                                    <p-button icon="pi pi-pencil" [text]="true"
-                                                                              size="small" [rounded]="true"
-                                                                              severity="secondary"
-                                                                              (onClick)="editRecord()"></p-button>
+                                                                    <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-wrap gap-2 w-full">
-                                                            <label class="font-bold" for="ratePerArea">Rate Per
-                                                                Area</label>
-                                                            <p-inputnumber inputId="ratePerArea" *ngIf="editMode"
-                                                                           formControlName="ratePerArea"></p-inputnumber>
+                                                            <label class="font-bold" for="ratePerArea">Rate Per Area</label>
+                                                            <p-inputnumber inputId="ratePerArea" *ngIf="editMode" formControlName="ratePerArea"></p-inputnumber>
 
-                                                            <div
-                                                                class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
-                                                                *ngIf="!editMode">
+                                                            <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
                                                                 <div>
                                                                     {{ propertyValue.ratePerArea | currency: 'AED ' }}
                                                                 </div>
                                                                 <div class="button-container">
-                                                                    <p-button icon="pi pi-pencil" [text]="true"
-                                                                              size="small" [rounded]="true"
-                                                                              severity="secondary"
-                                                                              (onClick)="editRecord()"></p-button>
+                                                                    <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -409,20 +334,15 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                                 <div [formGroupName]="i" class="flex flex-col md:flex-row gap-6">
                                                     <div class="flex flex-col gap-2 w-full">
                                                         <label for="feature-{{ i }}">Feature</label>
-                                                        <input pInputText id="feature-{{ i }}" type="text"
-                                                               formControlName="name" />
-                                                        <small class="text-red-500" *ngIf="isInvalidFeature('name', i)">Name
-                                                            is required.</small>
+                                                        <input pInputText id="feature-{{ i }}" type="text" formControlName="name" />
+                                                        <small class="text-red-500" *ngIf="isInvalidFeature('name', i)">Name is required.</small>
                                                     </div>
                                                     <div class="flex flex-col gap-2 w-full">
                                                         <label for="featureDescription-{{ i }}">Description</label>
-                                                        <textarea pTextarea id="featureDescription-{{ i }}" rows="2"
-                                                                  formControlName="description"></textarea>
+                                                        <textarea pTextarea id="featureDescription-{{ i }}" rows="2" formControlName="description"></textarea>
                                                     </div>
                                                     <div class="flex flex-wrap items-center">
-                                                        <p-button (onClick)="removeFeature(i)" icon="pi pi-trash"
-                                                                  severity="danger" [rounded]="true"
-                                                                  [outlined]="true"></p-button>
+                                                        <p-button (onClick)="removeFeature(i)" icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"></p-button>
                                                     </div>
                                                 </div>
                                             </ng-container>
@@ -433,29 +353,22 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                                         </div>
                                     </p-fluid>
 
-                                    <p-table *ngIf="!editMode" [value]="propertyValue.features" [scrollable]="true"
-                                             [tableStyle]="{ 'min-width': '50rem' }">
+                                    <p-table *ngIf="!editMode" [value]="propertyValue.features" [scrollable]="true" [tableStyle]="{ 'min-width': '50rem' }">
                                         <ng-template #header>
                                             <tr>
                                                 <th>
-                                                    <div
-                                                        class="w-full flex justify-between items-center parent-container">
+                                                    <div class="w-full flex justify-between items-center parent-container">
                                                         Feature
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                      [rounded]="true" severity="secondary"
-                                                                      (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </th>
                                                 <th>
-                                                    <div
-                                                        class="w-full flex justify-between items-center parent-container">
+                                                    <div class="w-full flex justify-between items-center parent-container">
                                                         Description
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
-                                                                      [rounded]="true" severity="secondary"
-                                                                      (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </th>
@@ -472,30 +385,21 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
                             </div>
 
                             <div class="flex gap-2 justify-center mt-4" *ngIf="editMode">
-                                <p-button label="Cancel" severity="danger" [text]="true" icon="pi pi-times" class="mr-2"
-                                          (onClick)="cancelEdit()" />
+                                <p-button label="Cancel" severity="danger" [text]="true" icon="pi pi-times" class="mr-2" (onClick)="cancelEdit()" />
                                 <p-button label="Save" variant="outlined" icon="pi pi-pencil" type="submit" />
                             </div>
                         </form>
                     </p-tabpanel>
                     <p-tabpanel value="1">
                         <p class="m-0">
-                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-                            laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-                            architecto beatae vitae dicta sunt explicabo. Nemo
-                            enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur
-                            magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed
-                            quia non numquam eius modi.
+                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo
+                            enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
                         </p>
                     </p-tabpanel>
                     <p-tabpanel value="2">
                         <p class="m-0">
-                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
-                            voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati
-                            cupiditate non provident, similique sunt in
-                            culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem
-                            rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi
-                            optio cumque nihil impedit quo minus.
+                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in
+                            culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
                         </p>
                     </p-tabpanel>
                 </p-tabpanels>
@@ -504,7 +408,7 @@ import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
     `,
     providers: [CountryService]
 })
-export class PropertyEdit {
+export class PropertyEdit implements OnInit {
     propertyTypes = [
         { name: 'Unit', code: 'Unit' },
         { name: 'Villa', code: 'Villa' },

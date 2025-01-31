@@ -1,14 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
-import { Toolbar, ToolbarModule } from 'primeng/toolbar';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { ToolbarModule } from 'primeng/toolbar';
 import { Milestone, MilestoneFee, PaymentPlan, SchedulePlan, PaymentplanService } from '../../service/paymentplan.service';
-import { Button, ButtonDirective, ButtonModule } from 'primeng/button';
-import { CommonModule, CurrencyPipe, Location, NgIf } from '@angular/common';
-import { Rating, RatingModule } from 'primeng/rating';
-import { Ripple, RippleModule } from 'primeng/ripple';
-import { TableModule, TableRowCollapseEvent, TableRowExpandEvent, TableRowReorderEvent } from 'primeng/table';
-import { Tag, TagModule } from 'primeng/tag';
+import { ButtonDirective, ButtonModule } from 'primeng/button';
+import { CommonModule, Location, NgIf } from '@angular/common';
+import { RatingModule } from 'primeng/rating';
+import { RippleModule } from 'primeng/ripple';
+import { TableModule, TableRowReorderEvent } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ButtonGroup, ButtonGroupModule } from 'primeng/buttongroup';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,7 +18,6 @@ import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
-import { Community } from '../../service/community.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ActivatedRoute } from '@angular/router';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -339,7 +338,7 @@ interface expandedRows {
     `,
     providers: [PaymentplanService, MessageService, ConfirmationService]
 })
-export class PaymentplanEdit {
+export class PaymentplanEdit implements OnInit {
     record!: PaymentPlan;
 
     recordId!: string | null;

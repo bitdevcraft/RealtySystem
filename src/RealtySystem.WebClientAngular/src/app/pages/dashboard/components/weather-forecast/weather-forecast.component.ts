@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 
 interface WeatherForecast {
     date: string;
@@ -9,23 +9,20 @@ interface WeatherForecast {
 }
 
 @Component({
-  selector: 'app-weather-forecast',
-  imports: [],
-  templateUrl: './weather-forecast.component.html',
-  styleUrl: './weather-forecast.component.scss'
+    selector: 'app-weather-forecast',
+    imports: [],
+    templateUrl: './weather-forecast.component.html',
+    styleUrl: './weather-forecast.component.scss'
 })
 export class WeatherForecastComponent {
     public forecasts: WeatherForecast[] = [];
 
-    constructor(
-        private http: HttpClient,
-    ) {
+    constructor(private http: HttpClient) {}
 
-    }
-
-    ngOnInit(){
+    ngOnInit() {
         this.getForecasts();
     }
+
     getForecasts() {
         this.http.get<WeatherForecast[]>('/api/WeatherForecast').subscribe(
             (result) => {
@@ -33,7 +30,7 @@ export class WeatherForecastComponent {
             },
             (error) => {
                 console.error(error);
-            },
+            }
         );
     }
 }

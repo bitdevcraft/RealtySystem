@@ -28,7 +28,7 @@ export class ProjectService {
     }
 
     getProjectsWithCommunity(): Observable<Project[]> {
-        return this.http.get<Project[]>(`${this.apiUrl}?_embed=community`);
+        return this.http.get<Project[]>(`${this.apiUrl}?_expand=community`);
     }
 
     getProjectsByName(name: string) {
@@ -36,6 +36,6 @@ export class ProjectService {
     }
 
     getProjectById(id: string) {
-        return this.http.get<Project>(`${this.apiUrl}/${id}?_embed=community`);
+        return this.http.get<Project>(`${this.apiUrl}/${id}?_expand=community`);
     }
 }

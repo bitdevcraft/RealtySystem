@@ -4,7 +4,7 @@ import { StatsWidget } from './components/statswidget';
 import { RecentSalesWidget } from './components/recentsaleswidget';
 import { BestSellingWidget } from './components/bestsellingwidget';
 import { RevenueStreamWidget } from './components/revenuestreamwidget';
-import {WeatherForecastComponent} from "./components/weather-forecast/weather-forecast.component";
+import { WeatherForecastComponent } from './components/weather-forecast/weather-forecast.component';
 
 @Component({
     selector: 'app-dashboard',

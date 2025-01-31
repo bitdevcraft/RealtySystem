@@ -27,4 +27,12 @@ export class CommunityService {
     getCommunitiesByName(name: string) {
         return this.http.get<Community[]>(`${this.apiUrl}?name_like=${name}`);
     }
+
+    postCommunity(community: Community) {
+        return this.http.post<Community>(this.apiUrl, community);
+    }
+
+    putCommunity(id: string, community: Community) {
+        return this.http.put<Community>(`${this.apiUrl}/${id}`, community);
+    }
 }

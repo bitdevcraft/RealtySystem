@@ -6,7 +6,7 @@ import { MenuModule } from 'primeng/menu';
     standalone: true,
     selector: 'app-notifications-widget',
     imports: [ButtonModule, MenuModule],
-    template: `<div class="card">
+    template: ` <div class="card">
         <div class="flex items-center justify-between mb-6">
             <div class="font-semibold text-xl">Notifications</div>
             <div>

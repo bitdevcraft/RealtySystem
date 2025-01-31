@@ -72,6 +72,7 @@ export class ChartDemo {
     radarOptions: any;
 
     subscription: Subscription;
+
     constructor(private layoutService: LayoutService) {
         this.subscription = this.layoutService.configUpdate$.pipe(debounceTime(25)).subscribe(() => {
             this.initCharts();
@@ -239,14 +240,14 @@ export class ChartDemo {
             scales: {
                 r: {
                     grid: {
-                        color: surfaceBorder,
+                        color: surfaceBorder
                     },
                     ticks: {
                         display: false,
                         color: textColorSecondary
-                    },
-                },
-            },
+                    }
+                }
+            }
         };
 
         this.radarData = {

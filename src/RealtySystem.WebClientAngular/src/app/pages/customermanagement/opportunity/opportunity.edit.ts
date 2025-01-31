@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'opportunity-edit',
-  imports: [],
-  template: `
-    <p>
-      opportunity works!
-    </p>
-  `
+    selector: 'opportunity-edit',
+    imports: [],
+    template: ` <p>opportunity works!</p> `
 })
-export class OpportunityEdit {
-
-}
+export class OpportunityEdit {}

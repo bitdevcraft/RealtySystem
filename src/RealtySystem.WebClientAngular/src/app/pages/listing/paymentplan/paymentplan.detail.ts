@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'paymentplan-detail',
-  imports: [],
-  template: `
-    <p>
-      paymentplan works!
-    </p>
-  `
+    selector: 'paymentplan-detail',
+    imports: [],
+    template: ` <p>paymentplan works!</p> `
 })
-export class PaymentplanDetail {
-
-}
+export class PaymentplanDetail {}

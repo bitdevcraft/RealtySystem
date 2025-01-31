@@ -1,40 +1,27 @@
-import {Component, ElementRef, signal, ViewChild} from '@angular/core';
-import {Button, ButtonDirective, ButtonIcon, ButtonLabel} from "primeng/button";
-import {PlusIcon} from "primeng/icons";
-import {RouterLink} from "@angular/router";
-import {Toolbar} from "primeng/toolbar";
-import {Booking, BookingService} from '../../service/booking.service';
-import {Table, TableModule} from "primeng/table";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {InputText} from "primeng/inputtext";
+import { Component, ElementRef, signal, ViewChild } from '@angular/core';
+import { Button, ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
+import { PlusIcon } from 'primeng/icons';
+import { RouterLink } from '@angular/router';
+import { Toolbar } from 'primeng/toolbar';
+import { Booking, BookingService } from '../../service/booking.service';
+import { Table, TableModule } from 'primeng/table';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
     selector: 'booking-view',
-    imports: [
-        Button,
-        ButtonDirective,
-        ButtonIcon,
-        ButtonLabel,
-        PlusIcon,
-        RouterLink,
-        Toolbar,
-        TableModule,
-        IconField,
-        InputIcon,
-        InputText
-    ],
+    imports: [Button, ButtonDirective, ButtonIcon, ButtonLabel, PlusIcon, RouterLink, Toolbar, TableModule, IconField, InputIcon, InputText],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <a routerLink="/realty/booking/new" pButton class="mr-2" severity="secondary">
-                    <PlusIcon pButtonIcon/>
+                    <PlusIcon pButtonIcon />
                     <span pButtonLabel>New</span>
                 </a>
             </ng-template>
 
-            <ng-template #end>
-            </ng-template>
+            <ng-template #end></ng-template>
         </p-toolbar>
 
         <p-table
@@ -55,11 +42,10 @@ import {InputText} from "primeng/inputtext";
                     <h5 class="m-0">Bookings</h5>
                     <div class="flex gap-2">
                         <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search"/>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."/>
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
                         </p-iconfield>
-                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
-                                  class="p-button-outlined mb-2" (onClick)="clear(dt)"/>
+                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                     </div>
                 </div>
             </ng-template>
@@ -102,13 +88,11 @@ export class BookingView {
 
     autoFilteredValue: any[] = [];
 
-    status: any [] = [];
+    status: any[] = [];
 
-    constructor(private bookingService: BookingService) {
-    }
+    constructor(private bookingService: BookingService) {}
 
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');

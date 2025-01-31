@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { Table, TableModule } from 'primeng/table';
@@ -21,17 +21,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CountryService } from '../../service/country.service';
 import { Country } from '../../service/customer.service';
-
-interface Column {
-    field: string;
-    header: string;
-    customExportHeader?: string;
-}
-
-interface ExportColumn {
-    title: string;
-    dataKey: string;
-}
 
 @Component({
     selector: 'community-view',
@@ -182,11 +171,12 @@ interface ExportColumn {
             </ng-template>
         </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }" />
+        <p-confirmdialog [style]="{ width: '450px' }"></p-confirmdialog>
+        <p-toast />
     `,
     providers: [MessageService, ConfirmationService, CommunityService, CountryService]
 })
-export class CommunityView {
+export class CommunityView implements OnInit {
     recordDialog: boolean = false;
 
     records = signal<Community[]>([]);
@@ -199,15 +189,11 @@ export class CommunityView {
 
     @ViewChild('dt') dt!: Table;
 
-    exportColumns!: ExportColumn[];
-
     @ViewChild('filter') filter!: ElementRef;
 
     countryService = inject(CountryService);
 
     countryList: Country[] | undefined;
-
-    cityList: { label: string; value: string }[] | undefined;
 
     constructor(
         private communityService: CommunityService,
@@ -235,7 +221,6 @@ export class CommunityView {
             error: (err) => console.log(err)
         });
     }
-
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
@@ -320,15 +305,29 @@ export class CommunityView {
         if (this.record.name?.trim()) {
             if (this.record.id) {
                 _records[this.findIndexById(this.record.id)] = this.record;
-                this.records.set([..._records]);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
+                this.communityService.putCommunity(this.record.id, this.record).subscribe({
+                    next: () => {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Updated',
+                            life: 3000
+                        });
+                        this.records.set([..._records]);
+                    },
+                    error: () => {
+                        this.messageService.add({
+                            severity: 'danger',
+                            summary: 'Error',
+                            detail: 'Unsuccessful',
+                            life: 3000
+                        });
+                    }
                 });
             } else {
+                // New
                 this.record.id = this.createId();
+                this.communityService.postCommunity(this.record);
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Successful',
