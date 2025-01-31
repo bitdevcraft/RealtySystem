@@ -386,15 +386,15 @@ export class PaymentplanEdit {
     ngOnInit() {
         this.recordId = this.route.snapshot.paramMap.get('id');
         if (this.recordId) {
-            this.paymentplanService.getPaymentPlan(this.recordId).then((result) => {
-                this.record = result as PaymentPlan;
-                this.milestones.set([...(this.record.milestones ?? [])]);
+            this.paymentplanService.getPaymentPlan(this.recordId).subscribe({
+                next: (data) => {
+                    this.record = data;
+                    this.milestones.set([...(this.record.milestones ?? [])]);
+                }
             });
         } else {
             this.editMode = true;
         }
-
-        // this.loadDemoData();
 
         this.intervalTypes = [
             { label: 'day', value: 'day' },
@@ -427,13 +427,6 @@ export class PaymentplanEdit {
 
     goBack() {
         this._location.back();
-    }
-
-    loadDemoData() {
-        this.paymentplanService.getPaymentPlan('1').then((result) => {
-            this.record = result as PaymentPlan;
-            this.milestones.set(this.record.milestones ?? []);
-        });
     }
 
     expandAll() {

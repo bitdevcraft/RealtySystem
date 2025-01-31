@@ -226,23 +226,15 @@ export class ProjectView {
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadData();
     }
 
-    loadDemoData() {
-        this.projectService.getProjectsLarge().then((data) => {
-            this.records.set(data);
+    loadData() {
+        this.projectService.getProjectsWithCommunity().subscribe({
+            next: (data) => {
+                this.records.set(data);
+            }
         });
-
-        this.cols = [
-            { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-            { field: 'name', header: 'Name' },
-            { field: 'image', header: 'Image' },
-            { field: 'price', header: 'Price' },
-            { field: 'category', header: 'Category' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -358,6 +350,10 @@ export class ProjectView {
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query).then((data) => (this.autoFilteredValue = data));
+        this.communityService.getCommunitiesByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 }

@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface MilestoneFee {
     id?: string | null;
@@ -271,23 +274,32 @@ export class PaymentplanService {
         ];
     }
 
+    private apiUrl = 'api/paymentPlans';
+
+    constructor(private http: HttpClient) {}
+
     getPaymentPlans() {
-        return Promise.resolve(this.getData());
+        return this.http.get<PaymentPlan[]>(this.apiUrl);
     }
 
     getPaymentPlan(id: string) {
-        return Promise.resolve(this.getData().find((p) => p.id === id));
+        return this.http.get<PaymentPlan>(`${this.apiUrl}/${id}`);
     }
 
     getPaymentPlanByProject(projectId?: string | null) {
-        let source = this.getData();
-
-        let target = projectId ? this.getData().slice(0, 1) : [];
-
-        return Promise.resolve({
-            source: source.filter((a) => !target.some((b) => a.id === b.id)),
-            target: target
-        });
+        return forkJoin({
+            source: this.http.get<PaymentPlan[]>(this.apiUrl),
+            target: this.http.get<PaymentPlan[]>(this.apiUrl)
+        }).pipe(
+            map((response: { source: PaymentPlan[]; target: PaymentPlan[] }) => {
+                let source = response.source;
+                let target = response.target.slice(0, 1);
+                return {
+                    source: source.filter((a) => !target.some((b) => a.id === b.id)),
+                    target: target
+                };
+            })
+        );
     }
 
     generateSchedulePlan(milestones: Milestone[], purchasePrice: number, startDate: Date) {
@@ -353,6 +365,4 @@ export class PaymentplanService {
 
         return data;
     }
-
-    constructor() {}
 }

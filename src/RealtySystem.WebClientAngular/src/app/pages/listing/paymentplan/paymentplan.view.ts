@@ -206,12 +206,14 @@ export class PaymentplanView {
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadData();
     }
 
-    loadDemoData() {
-        this.paymentplanService.getPaymentPlans().then((data) => {
-            this.records.set(data);
+    loadData() {
+        this.paymentplanService.getPaymentPlans().subscribe({
+            next: (data) => {
+                this.records.set(data);
+            }
         });
 
         this.cols = [
@@ -338,6 +340,10 @@ export class PaymentplanView {
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query).then((data) => (this.autoFilteredValue = data));
+        this.communityService.getCommunitiesByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 }

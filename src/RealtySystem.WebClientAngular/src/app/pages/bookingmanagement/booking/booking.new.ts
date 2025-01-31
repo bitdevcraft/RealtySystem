@@ -25,6 +25,7 @@ import { Dialog } from 'primeng/dialog';
 import { Fee, PaymentPlan, PaymentplanService, SchedulePlan } from '../../service/paymentplan.service';
 import { OptionService } from '../../service/option.service';
 import { TabsModule } from 'primeng/tabs';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 @Component({
     selector: 'booking-new',
@@ -51,8 +52,8 @@ import { TabsModule } from 'primeng/tabs';
         InputText,
         Dialog,
         TabsModule,
-        DatePipe,
-        NgIf
+        NgIf,
+        ScrollTopModule
     ],
     styles: `
         :host {
@@ -202,88 +203,87 @@ import { TabsModule } from 'primeng/tabs';
             </p-dataview>
         </div>
 
-        <p-dialog [(visible)]="propertyInfoDialog" [style]="{ width: '80rem' }" header="Property Info" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }" (onHide)="onHidePropertyInfo()">
+        <p-dialog [(visible)]="propertyInfoDialog" [style]="{ width: '80rem', height: '75vh' }" header="Property Info" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }" (onHide)="onHidePropertyInfo()">
             <div>
-                <div class="">
-                    <p-tabs [value]="0">
-                        <p-tablist>
-                            <p-tab [value]="0">Info</p-tab>
-                            <p-tab [value]="1">Sales Offer</p-tab>
-                        </p-tablist>
-                        <p-tabpanels>
-                            <p-tabpanel [value]="0"></p-tabpanel>
-                            <p-tabpanel [value]="1">
+                <p-tabs [value]="0">
+                    <p-tablist>
+                        <p-tab [value]="0">Info</p-tab>
+                        <p-tab [value]="1">Sales Offer</p-tab>
+                    </p-tablist>
+                    <p-tabpanels>
+                        <p-tabpanel [value]="0"></p-tabpanel>
+                        <p-tabpanel [value]="1">
+                            <div class="mb-6">
+                                <p-autoComplete
+                                    [forceSelection]="true"
+                                    placeholder="Select Payment Plan"
+                                    fluid
+                                    dropdown
+                                    appendTo="body"
+                                    optionLabel="name"
+                                    [(ngModel)]="selectedPaymentPlan"
+                                    [suggestions]="autoFilteredValue"
+                                    (completeMethod)="filterPaymentPlan($event)"
+                                    (onSelect)="onPaymentPlanSelected($event)"
+                                ></p-autoComplete>
+                            </div>
+                            <div *ngIf="!!selectedPaymentPlan">
                                 <div class="mb-6">
-                                    <p-autoComplete
-                                        [forceSelection]="true"
-                                        placeholder="Select Payment Plan"
-                                        fluid
-                                        dropdown
-                                        appendTo="body"
-                                        optionLabel="name"
-                                        [(ngModel)]="selectedPaymentPlan"
-                                        [suggestions]="autoFilteredValue"
-                                        (completeMethod)="filterPaymentPlan($event)"
-                                        (onSelect)="onPaymentPlanSelected($event)"
-                                    ></p-autoComplete>
+                                    <div class="font-semibold text-xl mb-4">Additional Fees</div>
+                                    <p-table [value]="selectedFees()" [rowHover]="true" showGridlines="true">
+                                        <ng-template #header>
+                                            <tr>
+                                                <th style="min-width: 12rem"></th>
+                                                <th style="min-width: 12rem">Price</th>
+                                                <th style="min-width: 12rem">Remarks</th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template #body let-previewData>
+                                            <tr>
+                                                <td style="min-width: 12rem">{{ previewData.name }}</td>
+                                                <td style="min-width: 12rem;">
+                                                    {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
+                                                </td>
+                                                <td style="min-width: 12rem">{{ previewData.remarks }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
                                 </div>
-                                <div *ngIf="!!selectedPaymentPlan">
-                                    <div class="mb-6">
-                                        <div class="font-semibold text-xl mb-4">Additional Fees</div>
-                                        <p-table [value]="selectedFees()" showGridlines="true" [scrollable]="true" scrollHeight="500px">
-                                            <ng-template #header>
-                                                <tr>
-                                                    <th style="min-width: 12rem"></th>
-                                                    <th style="min-width: 12rem">Price</th>
-                                                    <th style="min-width: 12rem">Remarks</th>
-                                                </tr>
-                                            </ng-template>
-                                            <ng-template #body let-previewData>
-                                                <tr>
-                                                    <td style="min-width: 12rem">{{ previewData.name }}</td>
-                                                    <td style="min-width: 12rem;">
-                                                        {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
-                                                    </td>
-                                                    <td style="min-width: 12rem">{{ previewData.remarks }}</td>
-                                                </tr>
-                                            </ng-template>
-                                        </p-table>
-                                    </div>
 
-                                    <div>
-                                        <div class="font-semibold text-xl mb-4">Payment Plan</div>
-                                        <p-table [value]="selectedSchedulePlan()" showGridlines="true" [scrollable]="true" scrollHeight="500px">
-                                            <ng-template #header>
-                                                <tr>
-                                                    <th style="text-align: center; min-width: 12rem">Name</th>
-                                                    <th style="text-align: center; min-width: 12rem">Percentage</th>
-                                                    <th style="text-align: center; min-width: 12rem">Price</th>
-                                                    <th style="text-align: center; min-width: 12rem">Remarks</th>
-                                                </tr>
-                                            </ng-template>
-                                            <ng-template #body let-previewData>
-                                                <tr>
-                                                    <td>{{ previewData.name }}</td>
-                                                    <td style="text-align: right; padding-right: 2rem">
-                                                        {{ previewData.percentage | number: '1.2' | prefixSuffix: '' : '%' }}
-                                                    </td>
-                                                    <td style="text-align: right; padding-right: 2rem">
-                                                        {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
-                                                    </td>
-                                                    <td>{{ previewData.remarks }}</td>
-                                                </tr>
-                                            </ng-template>
-                                        </p-table>
-                                    </div>
+                                <div>
+                                    <div class="font-semibold text-xl mb-4">Payment Plan</div>
+                                    <p-table [value]="selectedSchedulePlan()" [rowHover]="true" showGridlines="true">
+                                        <ng-template #header>
+                                            <tr>
+                                                <th style="text-align: center; min-width: 12rem">Name</th>
+                                                <th style="text-align: center; min-width: 12rem">Percentage</th>
+                                                <th style="text-align: center; min-width: 12rem">Price</th>
+                                                <th style="text-align: center; min-width: 12rem">Remarks</th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template #body let-previewData>
+                                            <tr>
+                                                <td>{{ previewData.name }}</td>
+                                                <td style="text-align: right; padding-right: 2rem">
+                                                    {{ previewData.percentage | number: '1.2' | prefixSuffix: '' : '%' }}
+                                                </td>
+                                                <td style="text-align: right; padding-right: 2rem">
+                                                    {{ previewData.price | number: '1.0-0' | prefixSuffix: 'AED' }}
+                                                </td>
+                                                <td>{{ previewData.remarks }}</td>
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
                                 </div>
-                            </p-tabpanel>
-                        </p-tabpanels>
-                    </p-tabs>
-                </div>
+                            </div>
+                        </p-tabpanel>
+                    </p-tabpanels>
+                </p-tabs>
             </div>
+            <p-scrolltop [threshold]="100" icon="pi pi-arrow-up" [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }"></p-scrolltop>
         </p-dialog>
     `,
-    providers: [PropertyService, ProductService, ProjectService, CommunityService, OptionService, PaymentplanService]
+    providers: [PropertyService, ProjectService, CommunityService, OptionService, PaymentplanService]
 })
 export class BookingNew {
     @ViewChild('op') op!: Popover;
@@ -330,7 +330,6 @@ export class BookingNew {
 
     constructor(
         private propertyService: PropertyService,
-        private productService: ProductService,
         private projectService: ProjectService,
         private communityService: CommunityService,
         private optionService: OptionService,
@@ -338,7 +337,7 @@ export class BookingNew {
     ) {}
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadData();
 
         this.sortOption = [
             { name: 'Default', code: 'Default' },
@@ -351,13 +350,11 @@ export class BookingNew {
         this.optionService.getNumberComparisonOperator().then((result) => (this.numberOperator = result));
     }
 
-    loadDemoData(): void {
-        this.propertyService.getPropertiesXLarge().then((result) => {
-            this.records.set(result);
-        });
-
-        this.productService.getProducts().then((data) => {
-            this.products.set([...data.slice(0, 12)]);
+    loadData(): void {
+        this.propertyService.getPropertiesWithProject().subscribe({
+            next: (data: any) => {
+                this.records.set(data);
+            }
         });
     }
 
@@ -391,17 +388,29 @@ export class BookingNew {
 
     filterProjects(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.projectService.getProjectsByName(query).then((data) => (this.autoFilteredValue = data));
+        this.projectService.getProjectsByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query).then((data) => (this.autoFilteredValue = data));
+        this.communityService.getCommunitiesByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 
     filterPaymentPlan(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.paymentPlanService.getPaymentPlans().then((data) => (this.autoFilteredValue = data));
+        this.paymentPlanService.getPaymentPlans().subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 
     toggle(event: any) {
@@ -482,8 +491,10 @@ export class BookingNew {
 
     getFilterResult() {
         console.log(this.filterCriteria);
-        this.propertyService.getFilteredProperty(this.filterCriteria, 'all').then((result) => {
-            this.records.set(result);
+        this.propertyService.getFilteredProperty(this.filterCriteria, 'all').subscribe({
+            next: (data) => {
+                this.records.set(data);
+            }
         });
     }
 

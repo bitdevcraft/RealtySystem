@@ -331,7 +331,7 @@ interface ExportColumn {
                             </div>
                         </p-fieldset>
                     </p-tabpanel>
-                    <p-tabpanel [value]="3"> </p-tabpanel>
+                    <p-tabpanel [value]="3"></p-tabpanel>
                 </p-tabpanels>
             </p-tabs>
         </div>
@@ -400,26 +400,30 @@ export class ProjectEdit {
     ngOnInit() {
         this.recordId = this.route.snapshot.paramMap.get('id');
         if (this.recordId) {
-            this.projectService.getProjectById(this.recordId).then((result) => {
-                this.record.set(result as Project);
-
-                this.recordForm.patchValue(result as Project);
+            this.projectService.getProjectById(this.recordId).subscribe({
+                next: (result) => {
+                    this.record.set({ ...result });
+                    this.recordForm.patchValue(result);
+                }
             });
 
-            this.propertyService.getPropertyByProject(this.recordId).then((data) => {
-                this.properties.set(data);
+            this.propertyService.getPropertyByProject(this.recordId).subscribe({
+                next: (result) => {
+                    this.properties.set(result);
+                }
             });
         } else {
             this.editMode = true;
             this.editPaymentPlan = true;
         }
 
-        this.paymentPlanService.getPaymentPlanByProject(this.recordId).then((result) => {
-            this.paymentPlanPicklist = result;
-            this.sourcePaymentPlans = [...result.source];
-            this.targetPaymentPlans = [...result.target];
+        this.paymentPlanService.getPaymentPlanByProject(this.recordId).subscribe({
+            next: (result) => {
+                this.paymentPlanPicklist = result;
+                this.sourcePaymentPlans = [...result.source];
+                this.targetPaymentPlans = [...result.target];
+            }
         });
-
         this.route.queryParams.subscribe((params) => {
             this.queryParams = params;
 
@@ -447,7 +451,11 @@ export class ProjectEdit {
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query).then((data) => (this.autoFilteredValue = data));
+        this.communityService.getCommunitiesByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 
     saveRecord() {
@@ -489,7 +497,8 @@ export class ProjectEdit {
         }
 
         this.editMode = false;
-        this.recordForm.reset(this.record);
+        console.log(this.record());
+        this.recordForm.reset(this.record());
         this.submitted = false;
     }
 

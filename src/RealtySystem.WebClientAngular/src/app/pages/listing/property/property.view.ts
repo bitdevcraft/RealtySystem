@@ -269,7 +269,7 @@ export class PropertyView {
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadData();
 
         this.types = [
             { label: 'Unit', value: 'Unit' },
@@ -278,20 +278,12 @@ export class PropertyView {
         ];
     }
 
-    loadDemoData() {
-        this.propertyService.getPropertiesLarge().then((data) => {
-            this.records.set(data);
+    loadData() {
+        this.propertyService.getPropertiesWithProject().subscribe({
+            next: (data) => {
+                this.records.set(data);
+            }
         });
-
-        this.cols = [
-            { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-            { field: 'name', header: 'Name' },
-            { field: 'image', header: 'Image' },
-            { field: 'price', header: 'Price' },
-            { field: 'category', header: 'Category' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -407,6 +399,10 @@ export class PropertyView {
 
     filterProjects(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.projectService.getProjectsByName(query).then((data) => (this.autoFilteredValue = data));
+        this.projectService.getProjectsByName(query).subscribe({
+            next: (data) => {
+                this.autoFilteredValue = data;
+            }
+        });
     }
 }

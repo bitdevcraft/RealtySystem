@@ -1,27 +1,26 @@
-import {Component, ElementRef, inject, signal, ViewChild} from '@angular/core';
-import {ButtonModule} from "primeng/button";
-import {ToolbarModule} from "primeng/toolbar";
-import {Table, TableModule} from "primeng/table";
-import {CommonModule} from "@angular/common";
-import {IconFieldModule} from "primeng/iconfield";
-import {InputIconModule} from "primeng/inputicon";
-import {InputTextModule} from "primeng/inputtext";
-import {DialogModule} from "primeng/dialog";
-import {FormsModule} from "@angular/forms";
-import {Community, CommunityService} from "../../service/community.service";
-import {TextareaModule} from "primeng/textarea";
-import {RippleModule} from "primeng/ripple";
-import {ToastModule} from "primeng/toast";
-import {RatingModule} from "primeng/rating";
-import {SelectModule} from "primeng/select";
-import {RadioButtonModule} from "primeng/radiobutton";
-import {InputNumberModule} from "primeng/inputnumber";
-import {TagModule} from "primeng/tag";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {CountryService} from "../../service/country.service";
-import {Country} from "../../service/customer.service";
-
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
+import { Table, TableModule } from 'primeng/table';
+import { CommonModule } from '@angular/common';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { Community, CommunityService } from '../../service/community.service';
+import { TextareaModule } from 'primeng/textarea';
+import { RippleModule } from 'primeng/ripple';
+import { ToastModule } from 'primeng/toast';
+import { RatingModule } from 'primeng/rating';
+import { SelectModule } from 'primeng/select';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { TagModule } from 'primeng/tag';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { CountryService } from '../../service/country.service';
+import { Country } from '../../service/customer.service';
 
 interface Column {
     field: string;
@@ -54,20 +53,17 @@ interface ExportColumn {
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule,
+        ConfirmDialogModule
     ],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
-                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
-                          (onClick)="deleteSelectedRecords()"
-                          [disabled]="!selectedRecords || !selectedRecords.length"/>
+                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedRecords()" [disabled]="!selectedRecords || !selectedRecords.length" />
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"
-                          [disabled]="true"/>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true" />
             </ng-template>
         </p-toolbar>
 
@@ -75,7 +71,6 @@ interface ExportColumn {
             #dt
             [value]="records()"
             [rows]="10"
-            [columns]="cols"
             [paginator]="true"
             [globalFilterFields]="['name', 'description', 'city', 'country']"
             [tableStyle]="{ 'min-width': '75rem' }"
@@ -91,43 +86,39 @@ interface ExportColumn {
                     <h5 class="m-0">Communities</h5>
                     <div class="flex gap-2">
                         <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search"/>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."/>
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
                         </p-iconfield>
-                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
-                                  class="p-button-outlined mb-2" (onClick)="clear(dt)"/>
+                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                     </div>
                 </div>
             </ng-template>
             <ng-template #header>
                 <tr>
                     <th style="width: 3rem">
-                        <p-tableHeaderCheckbox/>
+                        <p-tableHeaderCheckbox />
                     </th>
                     <th pSortableColumn="name" style="min-width:16rem">
                         <div class="flex justify-between items-center pr-4">
                             Name
                             <div>
-                                <p-sortIcon field="name"/>
-                                <p-columnFilter type="text" field="name" display="menu"
-                                                placeholder="Search by name"></p-columnFilter>
+                                <p-sortIcon field="name" />
+                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
                             </div>
                         </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
                             Description
-                            <p-columnFilter type="text" field="description" display="menu"
-                                            placeholder="Search by description"></p-columnFilter>
+                            <p-columnFilter type="text" field="description" display="menu" placeholder="Search by description"></p-columnFilter>
                         </div>
                     </th>
                     <th pSortableColumn="city" style="min-width:10rem">
                         <div class="flex justify-between items-center pr-4">
                             City
                             <div>
-                                <p-sortIcon field="city"/>
-                                <p-columnFilter type="text" field="city" display="menu"
-                                                placeholder="Search by city"></p-columnFilter>
+                                <p-sortIcon field="city" />
+                                <p-columnFilter type="text" field="city" display="menu" placeholder="Search by city"></p-columnFilter>
                             </div>
                         </div>
                     </th>
@@ -135,9 +126,8 @@ interface ExportColumn {
                         <div class="flex justify-between items-center pr-4">
                             Country
                             <div>
-                                <p-sortIcon field="country"/>
-                                <p-columnFilter type="text" field="country" display="menu"
-                                                placeholder="Search by country"></p-columnFilter>
+                                <p-sortIcon field="country" />
+                                <p-columnFilter type="text" field="country" display="menu" placeholder="Search by country"></p-columnFilter>
                             </div>
                         </div>
                     </th>
@@ -147,7 +137,7 @@ interface ExportColumn {
             <ng-template #body let-record>
                 <tr>
                     <td style="width: 3rem">
-                        <p-tableCheckbox [value]="record"/>
+                        <p-tableCheckbox [value]="record" />
                     </td>
                     <td style="min-width: 16rem">{{ record.name }}</td>
                     <td>{{ record.description }}</td>
@@ -155,10 +145,8 @@ interface ExportColumn {
                     <td>{{ record.country }}</td>
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
-                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                                      (click)="editRecord(record)"/>
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                      (click)="deleteRecord(record)"/>
+                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editRecord(record)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteRecord(record)" />
                         </div>
                     </td>
                 </tr>
@@ -170,37 +158,31 @@ interface ExportColumn {
                 <div class="flex flex-col gap-6">
                     <div>
                         <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid/>
+                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
                     </div>
                     <div>
                         <label for="country" class="block font-bold mb-3">Country</label>
-                        <p-select [(ngModel)]="record.country" inputId="country" [options]="countryList"
-                                  [filter]="true" filterBy="name" [showClear]="true"
-                                  appendTo="body"
-                                  optionLabel="name" optionValue="name" placeholder="Select a Country" fluid/>
+                        <p-select [(ngModel)]="record.country" inputId="country" [options]="countryList" [filter]="true" filterBy="name" [showClear]="true" appendTo="body" optionLabel="name" optionValue="name" placeholder="Select a Country" fluid />
                     </div>
                     <div>
                         <label for="city" class="block font-bold mb-3">City</label>
-                        <input type="text" pInputText id="city" [(ngModel)]="record.city" autofocus fluid/>
+                        <input type="text" pInputText id="city" [(ngModel)]="record.city" autofocus fluid />
                     </div>
                     <div>
                         <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3"
-                                  cols="20" fluid></textarea>
+                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3" cols="20" fluid></textarea>
                     </div>
-
-
                 </div>
             </ng-template>
 
             <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()"/>
-                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()"/>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()" />
             </ng-template>
         </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }"/>
+        <p-confirmdialog [style]="{ width: '450px' }" />
     `,
     providers: [MessageService, ConfirmationService, CommunityService, CountryService]
 })
@@ -219,13 +201,11 @@ export class CommunityView {
 
     exportColumns!: ExportColumn[];
 
-    cols!: Column[];
-
     @ViewChild('filter') filter!: ElementRef;
 
     countryService = inject(CountryService);
 
-    countryList: Country[] | undefined
+    countryList: Country[] | undefined;
 
     cityList: { label: string; value: string }[] | undefined;
 
@@ -233,36 +213,29 @@ export class CommunityView {
         private communityService: CommunityService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
-    ) {
-    }
+    ) {}
 
     exportCSV() {
         this.dt.exportCSV();
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadData();
 
         this.countryService.getCountries().then((countries) => {
             this.countryList = countries;
         });
     }
 
-    loadDemoData() {
-        this.communityService.getCommunitiesLarge().then((data) => {
-            this.records.set(data);
+    loadData() {
+        this.communityService.getCommunities().subscribe({
+            next: (data) => {
+                this.records.set(data);
+            },
+            error: (err) => console.log(err)
         });
-
-        this.cols = [
-            {field: 'code', header: 'Code', customExportHeader: 'Product Code'},
-            {field: 'name', header: 'Name'},
-            {field: 'image', header: 'Image'},
-            {field: 'price', header: 'Price'},
-            {field: 'category', header: 'Category'}
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({title: col.header, dataKey: col.field}));
     }
+
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
@@ -275,7 +248,7 @@ export class CommunityView {
     }
 
     editRecord(record: Community) {
-        this.record = {...record};
+        this.record = { ...record };
         this.recordDialog = true;
     }
 
