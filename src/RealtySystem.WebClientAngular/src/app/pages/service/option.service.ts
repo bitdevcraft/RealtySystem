@@ -1,60 +1,49 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+export interface Option {
+    id?: string | null;
+    type?: string | null;
+    order?: number | null;
+    label?: string | null;
+    code?: string | null;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class OptionService {
-    constructor() {}
+    constructor(private http: HttpClient) {}
+
+    private apiUrl = 'api/options';
 
     getPropertyTypes() {
-        return Promise.resolve([
-            { name: 'Unit', code: 'Unit' },
-            { name: 'Villa', code: 'Villa' },
-            { name: 'Plot', code: 'Plot' }
-        ]);
+        const type = 'PropertyType';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 
     getPropertyStatus() {
-        return Promise.resolve([
-            { name: 'Draft', code: 'Draft' },
-            { name: 'Available', code: 'Available' },
-            { name: 'Sold', code: 'Sold' },
-            { name: 'Hold', code: 'Hold' },
-            { name: 'Not For Sale', code: 'Not For Sale' }
-        ]);
+        const type = 'PropertyStatus';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 
     getPropertyListing() {
-        return Promise.resolve([
-            { name: 'Sale', code: 'Sale' },
-            { name: 'Rental', code: 'Rental' }
-        ]);
+        const type = 'ListingType';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 
     getNumberComparisonOperator() {
-        return Promise.resolve([
-            { name: 'Equals', code: 'eq' },
-            { name: 'Not equals', code: 'neq' },
-            { name: 'Less than', code: 'lt' },
-            { name: 'Less than or equal to', code: 'lte' },
-            { name: 'Greater than', code: 'gt' },
-            { name: 'Greater than or equal to', code: 'gte' }
-        ]);
+        const type = 'NumberComparison';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 
     getMatchType() {
-        return Promise.resolve([
-            { name: 'Match Any', code: 'any' },
-            { name: 'Match All', code: 'all' }
-        ]);
+        const type = 'MatchType';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 
     getIntervalType() {
-        return Promise.resolve([
-            { name: 'day', code: 'day' },
-            { name: 'week', code: 'week' },
-            { name: 'month', code: 'month' },
-            { name: 'year', code: 'year' }
-        ]);
+        const type = 'IntervalType';
+        return this.http.get<Option[]>(`${this.apiUrl}?type=${type}`);
     }
 }

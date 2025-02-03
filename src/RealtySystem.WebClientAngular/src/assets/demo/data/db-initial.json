@@ -11033,5 +11033,161 @@
             ]
         }
     ],
-    "bookings": []
+    "bookings": [],
+    "options": [
+        {
+            "id": "1",
+            "type": "PropertyType",
+            "order": 0,
+            "name": "Unit",
+            "code": "Unit"
+        },
+        {
+            "id": "2",
+            "type": "PropertyType",
+            "order": 1,
+            "name": "Villa",
+            "code": "Villa"
+        },
+        {
+            "id": "3",
+            "type": "PropertyType",
+            "order": 2,
+            "name": "Plot",
+            "code": "Plot"
+        },
+        {
+            "id": "4",
+            "type": "PropertyStatus",
+            "order": 0,
+            "name": "Draft",
+            "code": "Draft"
+        },
+        {
+            "id": "5",
+            "type": "PropertyStatus",
+            "order": 1,
+            "name": "Available",
+            "code": "Available"
+        },
+        {
+            "id": "6",
+            "type": "PropertyStatus",
+            "order": 2,
+            "name": "Sold",
+            "code": "Sold"
+        },
+        {
+            "id": "7",
+            "type": "PropertyStatus",
+            "order": 3,
+            "name": "Hold",
+            "code": "Hold"
+        },
+        {
+            "id": "8",
+            "type": "PropertyStatus",
+            "order": 4,
+            "name": "Not For Sale",
+            "code": "Not For Sale"
+        },
+        {
+            "id": "9",
+            "type": "ListingType",
+            "order": 0,
+            "name": "Sale",
+            "code": "Sale"
+        },
+        {
+            "id": "10",
+            "type": "ListingType",
+            "order": 1,
+            "name": "Rental",
+            "code": "Rental"
+        },
+        {
+            "id": "11",
+            "type": "NumberComparison",
+            "order": 0,
+            "name": "Equals",
+            "code": "eq"
+        },
+        {
+            "id": "12",
+            "type": "NumberComparison",
+            "order": 1,
+            "name": "Not equals",
+            "code": "neq"
+        },
+        {
+            "id": "13",
+            "type": "NumberComparison",
+            "order": 2,
+            "name": "Less than",
+            "code": "lt"
+        },
+        {
+            "id": "14",
+            "type": "NumberComparison",
+            "order": 3,
+            "name": "Less than or equal to",
+            "code": "lte"
+        },
+        {
+            "id": "15",
+            "type": "NumberComparison",
+            "order": 4,
+            "name": "Greater than",
+            "code": "gt"
+        },
+        {
+            "id": "16",
+            "type": "NumberComparison",
+            "order": 5,
+            "name": "Greater than or equal to",
+            "code": "gte"
+        },
+        {
+            "id": "17",
+            "type": "MatchType",
+            "order": 0,
+            "name": "Match Any",
+            "code": "any"
+        },
+        {
+            "id": "18",
+            "type": "MatchType",
+            "order": 1,
+            "name": "Match All",
+            "code": "all"
+        },
+        {
+            "id": "19",
+            "type": "IntervalType",
+            "order": 0,
+            "name": "day",
+            "code": "day"
+        },
+        {
+            "id": "20",
+            "type": "IntervalType",
+            "order": 1,
+            "name": "week",
+            "code": "week"
+        },
+        {
+            "id": "21",
+            "type": "IntervalType",
+            "order": 2,
+            "name": "month",
+            "code": "month"
+        },
+        {
+            "id": "22",
+            "type": "IntervalType",
+            "order": 3,
+            "name": "year",
+            "code": "year"
+        }
+    ]
 }

@@ -261,18 +261,33 @@ export class CommunityView implements OnInit {
     }
 
     deleteRecord(record: Community) {
+        if (!record.id) return;
+
         this.confirmationService.confirm({
             message: 'Are you sure you want to delete ' + record.name + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.records.set(this.records().filter((val) => val.id !== record.id));
-                this.record = {};
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Deleted',
-                    life: 3000
+                if (!record.id) return;
+                this.communityService.deleteCommunity(record.id).subscribe({
+                    next: () => {
+                        this.records.set(this.records().filter((val) => val.id !== record.id));
+                        this.record = {};
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Community Deleted',
+                            life: 3000
+                        });
+                    },
+                    error: () => {
+                        this.messageService.add({
+                            severity: 'danger',
+                            summary: 'Error',
+                            detail: 'Unsuccessful',
+                            life: 3000
+                        });
+                    }
                 });
             }
         });
@@ -310,7 +325,7 @@ export class CommunityView implements OnInit {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Successful',
-                            detail: 'Updated',
+                            detail: 'Community Updated',
                             life: 3000
                         });
                         this.records.set([..._records]);
@@ -327,14 +342,25 @@ export class CommunityView implements OnInit {
             } else {
                 // New
                 this.record.id = this.createId();
-                this.communityService.postCommunity(this.record);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
+                this.communityService.postCommunity(this.record).subscribe({
+                    next: () => {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Community Added',
+                            life: 3000
+                        });
+                        this.records.set([..._records, this.record]);
+                    },
+                    error: (err) => {
+                        this.messageService.add({
+                            severity: 'danger',
+                            summary: 'Error',
+                            detail: 'Unsuccessful',
+                            life: 3000
+                        });
+                    }
                 });
-                this.records.set([..._records, this.record]);
             }
 
             this.recordDialog = false;

@@ -344,9 +344,23 @@ export class BookingNew {
             { name: 'Price higher to lower', code: 'Price higher to lower' }
         ];
 
-        this.optionService.getPropertyTypes().then((result) => (this.types = result));
-        this.optionService.getMatchType().then((result) => (this.matchTypeOption = result));
-        this.optionService.getNumberComparisonOperator().then((result) => (this.numberOperator = result));
+        this.optionService.getPropertyTypes().subscribe({
+            next: (result) => {
+                this.types = result;
+            }
+        });
+
+        this.optionService.getMatchType().subscribe({
+            next: (result) => {
+                this.matchTypeOption = result;
+            }
+        });
+
+        this.optionService.getNumberComparisonOperator().subscribe({
+            next: (result) => {
+                this.numberOperator = result;
+            }
+        });
     }
 
     loadData(): void {

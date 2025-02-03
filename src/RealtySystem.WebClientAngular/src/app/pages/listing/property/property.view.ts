@@ -26,6 +26,7 @@ import { Property, PropertyService } from '../../service/property.service';
 import { RouterModule } from '@angular/router';
 import { PencilIcon, PlusIcon, SearchIcon, WindowMaximizeIcon } from 'primeng/icons';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
+import { OptionService } from '../../service/option.service';
 
 interface Column {
     field: string;
@@ -59,7 +60,6 @@ interface ExportColumn {
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
-        AutoComplete,
         RouterModule,
         PlusIcon,
         SearchIcon,
@@ -68,12 +68,10 @@ interface ExportColumn {
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
-                <!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>-->
                 <a routerLink="/realty/listing/property/add" pButton class="mr-2" severity="secondary">
                     <PlusIcon pButtonIcon />
                     <span pButtonLabel>New</span>
                 </a>
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedRecords()" [disabled]="!selectedRecords || !selectedRecords.length" />
             </ng-template>
 
             <ng-template #end>
@@ -85,7 +83,6 @@ interface ExportColumn {
             #dt
             [value]="records()"
             [rows]="10"
-            [columns]="cols"
             [paginator]="true"
             [globalFilterFields]="['name', 'description', 'project.name']"
             [tableStyle]="{ 'min-width': '75rem' }"
@@ -205,61 +202,28 @@ interface ExportColumn {
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="recordDialog" [style]="{ width: '450px' }" header="Project Details" [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <div>
-                        <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
-                    </div>
-                    <div>
-                        <p-autocomplete [(ngModel)]="record.project" [suggestions]="autoFilteredValue" optionLabel="name" placeholder="Search" dropdown (completeMethod)="filterProjects($event)" fluid></p-autocomplete>
-                    </div>
-                    <div>
-                        <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3" cols="20" fluid></textarea>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()" />
-            </ng-template>
-        </p-dialog>
-
+        <p-toast />
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
-    providers: [MessageService, ConfirmationService, ProjectService, CountryService, CommunityService, PropertyService]
+    providers: [MessageService, ConfirmationService, ProjectService, CountryService, PropertyService, OptionService]
 })
 export class PropertyView implements OnInit {
-    recordDialog: boolean = false;
-
     records = signal<Property[]>([]);
 
     record!: Property;
 
     selectedRecords!: Property[] | null;
 
-    submitted: boolean = false;
-
     @ViewChild('dt') dt!: Table;
 
-    exportColumns!: ExportColumn[];
-
-    cols!: Column[];
-
     @ViewChild('filter') filter!: ElementRef;
-
-    autoFilteredValue: any[] = [];
 
     types: any[] = [];
 
     constructor(
         private projectService: ProjectService,
+        private optionService: OptionService,
         private propertyService: PropertyService,
-        private communityService: CommunityService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
     ) {}
@@ -271,11 +235,11 @@ export class PropertyView implements OnInit {
     ngOnInit() {
         this.loadData();
 
-        this.types = [
-            { label: 'Unit', value: 'Unit' },
-            { label: 'Villa', value: 'Villa' },
-            { label: 'Plot', value: 'Plot' }
-        ];
+        this.optionService.getPropertyTypes().subscribe({
+            next: (result) => {
+                this.types = result;
+            }
+        });
     }
 
     loadData() {
@@ -290,119 +254,44 @@ export class PropertyView implements OnInit {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
     }
 
-    openNew() {
-        this.record = {};
-        this.submitted = false;
-        this.recordDialog = true;
-    }
-
-    editRecord(record: Project) {
-        this.record = { ...record };
-        this.recordDialog = true;
-    }
-
-    deleteSelectedRecords() {
-        this.confirmationService.confirm({
-            message: 'Are you sure you want to delete the selected records?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.records.set(this.records().filter((val) => !this.selectedRecords?.includes(val)));
-                this.selectedRecords = null;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Records Deleted',
-                    life: 3000
-                });
-            }
-        });
-    }
-
-    hideDialog() {
-        this.recordDialog = false;
-        this.submitted = false;
-    }
-
     deleteRecord(record: Project) {
         this.confirmationService.confirm({
             message: 'Are you sure you want to delete ' + record.name + '?',
             header: 'Confirm',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.records.set(this.records().filter((val) => val.id !== record.id));
-                this.record = {};
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Record Deleted',
-                    life: 3000
+                if (!record.id) return;
+
+                this.propertyService.deleteProperty(record.id).subscribe({
+                    next: () => {
+                        this.records.set(this.records().filter((val) => val.id !== record.id));
+                        this.record = {};
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Record Deleted',
+                            life: 3000
+                        });
+                    },
+                    error: () => {
+                        this.errorMessage();
+                    }
                 });
             }
         });
     }
 
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.records().length; i++) {
-            if (this.records()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    createId(): string {
-        let id = '';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-    saveRecord() {
-        this.submitted = true;
-        let _records = this.records();
-        if (this.record.name?.trim()) {
-            if (this.record.id) {
-                _records[this.findIndexById(this.record.id)] = this.record;
-                this.records.set([..._records]);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
-                });
-            } else {
-                this.record.id = this.createId();
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
-                });
-                this.records.set([..._records, this.record]);
-            }
-
-            this.recordDialog = false;
-            this.record = {};
-        }
+    errorMessage() {
+        this.messageService.add({
+            severity: 'danger',
+            summary: 'Error',
+            detail: 'Unsuccessful',
+            life: 3000
+        });
     }
 
     clear(table: Table) {
         table.clear();
         if (this.filter) this.filter.nativeElement.value = '';
-    }
-
-    filterProjects(event: AutoCompleteCompleteEvent) {
-        const query = event.query;
-        this.projectService.getProjectsByName(query).subscribe({
-            next: (data) => {
-                this.autoFilteredValue = data;
-            }
-        });
     }
 }

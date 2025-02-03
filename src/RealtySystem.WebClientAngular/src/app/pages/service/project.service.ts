@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Community } from './community.service';
 import { Property } from './property.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
 
@@ -23,12 +23,17 @@ export class ProjectService {
     private apiUrl = '/api/projects';
     private apiUrlCommunities = '/api/communities';
 
-    getProjects() {
-        return this.http.get<Project[]>(`${this.apiUrl}`);
+    getProjects(params: HttpParams) {
+        console.log(params);
+        return this.http.get<Project[]>(`${this.apiUrl}`, { params, observe: 'response' });
     }
 
     getProjectsWithCommunity(): Observable<Project[]> {
         return this.http.get<Project[]>(`${this.apiUrl}?_expand=community`);
+    }
+
+    getProjectsWithCommunityWithPage(page: number, pageSize: number) {
+        return this.http.get<Project[]>(`${this.apiUrl}?_expand=community&_page=${page}&_limit=${pageSize}`, { observe: 'response' });
     }
 
     getProjectsByName(name: string) {
@@ -37,5 +42,17 @@ export class ProjectService {
 
     getProjectById(id: string) {
         return this.http.get<Project>(`${this.apiUrl}/${id}?_expand=community`);
+    }
+
+    postProject(project: Project) {
+        return this.http.post<Project>(this.apiUrl, project);
+    }
+
+    putProject(id: string, project: Project) {
+        return this.http.put<Project>(`${this.apiUrl}/${id}`, project);
+    }
+
+    deleteProject(id: string) {
+        return this.http.delete(`${this.apiUrl}/${id}`);
     }
 }

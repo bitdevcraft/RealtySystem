@@ -24,6 +24,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 import { InfoCircleIcon } from 'primeng/icons';
 import { TooltipModule } from 'primeng/tooltip';
+import { OptionService } from '../../service/option.service';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -236,7 +237,7 @@ interface expandedRows {
                             </div>
                             <div class="flex flex-wrap w-full flex-col">
                                 <label for="intervalType" class="block font-bold mb-3">Interval Type</label>
-                                <p-select [(ngModel)]="milestone.frequencyIntervalType" inputId="intervalType" [options]="intervalTypes" optionLabel="label" optionValue="value" placeholder="Select a Interval Type" fluid appendTo="body" />
+                                <p-select [(ngModel)]="milestone.frequencyIntervalType" inputId="intervalType" [options]="intervalTypes" optionLabel="name" optionValue="code" placeholder="Select a Interval Type" fluid appendTo="body" />
                             </div>
                         </div>
                         <div>
@@ -336,7 +337,7 @@ interface expandedRows {
 
         <p-confirmdialog [style]="{ width: '450px' }"></p-confirmdialog>
     `,
-    providers: [PaymentplanService, MessageService, ConfirmationService]
+    providers: [PaymentplanService, MessageService, ConfirmationService, OptionService]
 })
 export class PaymentplanEdit implements OnInit {
     record!: PaymentPlan;
@@ -361,8 +362,6 @@ export class PaymentplanEdit implements OnInit {
 
     intervalTypes: any[] = [];
 
-    feeTypes: any[] = [];
-
     previewDialog: boolean = false;
 
     previewPrice: number = 7325897.97836;
@@ -377,6 +376,7 @@ export class PaymentplanEdit implements OnInit {
 
     constructor(
         private paymentplanService: PaymentplanService,
+        private optionService: OptionService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private _location: Location
@@ -395,17 +395,11 @@ export class PaymentplanEdit implements OnInit {
             this.editMode = true;
         }
 
-        this.intervalTypes = [
-            { label: 'day', value: 'day' },
-            { label: 'week', value: 'week' },
-            { label: 'month', value: 'month' },
-            { label: 'year', value: 'year' }
-        ];
-
-        this.feeTypes = [
-            { label: 'Fixed Amount', value: 'fixed' },
-            { label: 'Rate', value: 'rate' }
-        ];
+        this.optionService.getIntervalType().subscribe({
+            next: (result) => {
+                this.intervalTypes = result;
+            }
+        });
     }
 
     editPaymentPlan() {

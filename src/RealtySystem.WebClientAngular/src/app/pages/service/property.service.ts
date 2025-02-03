@@ -60,6 +60,18 @@ export class PropertyService {
         return this.http.get<Property>(`${this.apiUrl}/${id}?_expand=project`);
     }
 
+    postProperty(property: Property) {
+        return this.http.post<Property>(this.apiUrl, property);
+    }
+
+    putProperty(id: string, property: Property) {
+        return this.http.put<Property>(`${this.apiUrl}/${id}`, property);
+    }
+
+    deleteProperty(id: string) {
+        return this.http.delete(`${this.apiUrl}/${id}`);
+    }
+
     getPropertyByProject(projectId: string) {
         return this.http.get<Property[]>(`${this.apiUrl}?projectId=${projectId}`);
     }

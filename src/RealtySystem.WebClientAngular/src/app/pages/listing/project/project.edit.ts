@@ -9,7 +9,7 @@ import { TabsModule } from 'primeng/tabs';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FluidModule } from 'primeng/fluid';
 import { InputText, InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommunityService } from '../../service/community.service';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Textarea } from 'primeng/textarea';
@@ -25,6 +25,7 @@ import { Select, SelectModule } from 'primeng/select';
 import { SearchIcon } from 'primeng/icons';
 import { PickListModule } from 'primeng/picklist';
 import { PaymentplanService } from '../../service/paymentplan.service';
+import { ToastModule } from 'primeng/toast';
 
 interface Column {
     field: string;
@@ -61,7 +62,8 @@ interface ExportColumn {
         SelectModule,
         FormsModule,
         SearchIcon,
-        PickListModule
+        PickListModule,
+        ToastModule
     ],
     styles: `
         .parent-container .button-container {
@@ -77,7 +79,8 @@ interface ExportColumn {
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
                 <div>
-                    <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2" (onClick)="goBack()"></p-button>
+                    <p-button icon="pi pi-arrow-left" [rounded]="true" variant="outlined" class="mr-2"
+                              (onClick)="goBack()"></p-button>
                 </div>
                 <div class="flex flex-col pl-2">
                     <div class="text-sm text-surface-500 dark:text-surface-400">Project</div>
@@ -106,21 +109,28 @@ interface ExportColumn {
                                     <p-fluid>
                                         <div class="mb-4 mt-4 flex flex-col gap-6 w-full ">
                                             <div class="flex flex-col md:flex-row gap-6">
-                                                <div class="flex flex-wrap gap-2 w-full">
+                                                <div class="flex flex-col gap-2 w-full">
                                                     <label class="font-bold" for="name">Name</label>
-                                                    <input *ngIf="editMode" pInputText id="name" type="text" formControlName="name" />
-                                                    <small class="text-red-500" *ngIf="recordFormControl['name'].invalid && (recordFormControl['name'].dirty || recordFormControl['name'].touched)">Name is required.</small>
+                                                    <input *ngIf="editMode" pInputText id="name" type="text"
+                                                           formControlName="name" />
+                                                    <small class="text-red-500"
+                                                           *ngIf="recordFormControl['name'].invalid && (recordFormControl['name'].dirty || recordFormControl['name'].touched)">Name
+                                                        is required.</small>
 
-                                                    <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
+                                                    <div
+                                                        class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
+                                                        *ngIf="!editMode">
                                                         <div>
                                                             {{ recordFormValue.name }}
                                                         </div>
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
+                                                                      [rounded]="true" severity="secondary"
+                                                                      (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="flex flex-wrap flex-col gap-2 w-full">
+                                                <div class="flex flex-col flex-col gap-2 w-full">
                                                     <label class="font-bold" for="community">Community</label>
                                                     <p-autocomplete
                                                         *ngIf="editMode"
@@ -130,14 +140,22 @@ interface ExportColumn {
                                                         optionLabel="name"
                                                         placeholder="Search"
                                                         (completeMethod)="filterCommunity($event)"
+                                                        fluid
                                                     ></p-autocomplete>
+                                                    <small class="text-red-500"
+                                                           *ngIf="recordFormControl['community'].invalid && (recordFormControl['community'].dirty || recordFormControl['community'].touched)">Community
+                                                        is required.</small>
 
-                                                    <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
+                                                    <div
+                                                        class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
+                                                        *ngIf="!editMode">
                                                         <div>
                                                             {{ recordFormValue.community?.name }}
                                                         </div>
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
+                                                                      [rounded]="true" severity="secondary"
+                                                                      (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -145,14 +163,19 @@ interface ExportColumn {
                                             <div class="flex flex-col md:flex-row gap-6">
                                                 <div class="flex flex-wrap flex-col gap-2 w-full">
                                                     <label class="font-bold" for="description">Description</label>
-                                                    <textarea *ngIf="editMode" formControlName="description" pTextarea id="description" rows="4"></textarea>
+                                                    <textarea *ngIf="editMode" formControlName="description" pTextarea
+                                                              id="description" rows="4"></textarea>
 
-                                                    <div class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container" *ngIf="!editMode">
+                                                    <div
+                                                        class=" border-b w-full pl-2.5 pr-2.5 flex justify-between items-center parent-container"
+                                                        *ngIf="!editMode">
                                                         <div>
                                                             {{ recordFormValue.description }}
                                                         </div>
                                                         <div class="button-container">
-                                                            <p-button icon="pi pi-pencil" [text]="true" size="small" [rounded]="true" severity="secondary" (onClick)="editRecord()"></p-button>
+                                                            <p-button icon="pi pi-pencil" [text]="true" size="small"
+                                                                      [rounded]="true" severity="secondary"
+                                                                      (onClick)="editRecord()"></p-button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -162,7 +185,8 @@ interface ExportColumn {
                                 </p-fieldset>
                             </div>
                             <div class="card text-center" *ngIf="editMode">
-                                <p-button icon="pi pi-times" label="Cancel" [text]="true" severity="danger" class="mr-2" (onClick)="cancelEdit()"></p-button>
+                                <p-button icon="pi pi-times" label="Cancel" [text]="true" severity="danger" class="mr-2"
+                                          (onClick)="cancelEdit()"></p-button>
                                 <p-button icon="pi pi-pencil" label="Save" [outlined]="true" type="submit"></p-button>
                             </div>
                         </form>
@@ -174,6 +198,7 @@ interface ExportColumn {
                             [rows]="10"
                             [columns]="cols"
                             [paginator]="true"
+                            [showFirstLastIcon]="false"
                             [globalFilterFields]="['name', 'description', 'project.name']"
                             [tableStyle]="{ 'min-width': '75rem' }"
                             [(selection)]="selectedProperties"
@@ -189,9 +214,11 @@ interface ExportColumn {
                                     <div class="flex gap-2">
                                         <p-iconfield>
                                             <p-inputicon styleClass="pi pi-search" />
-                                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                                   placeholder="Search..." />
                                         </p-iconfield>
-                                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
+                                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
+                                                  class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                                     </div>
                                 </div>
                             </ng-template>
@@ -205,7 +232,8 @@ interface ExportColumn {
                                             Name
                                             <div>
                                                 <p-sortIcon field="name" />
-                                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
+                                                <p-columnFilter type="text" field="name" display="menu"
+                                                                placeholder="Search by name"></p-columnFilter>
                                             </div>
                                         </div>
                                     </th>
@@ -216,9 +244,12 @@ interface ExportColumn {
                                                 <p-sortIcon field="type" />
                                                 <p-columnFilter field="type" matchMode="equals" display="menu">
                                                     <ng-template #filter let-value let-filter="filterCallback">
-                                                        <p-select [ngModel]="value" [options]="types" (onChange)="filter($event.value)" placeholder="Any" [style]="{ 'min-width': '12rem' }">
+                                                        <p-select [ngModel]="value" [options]="types"
+                                                                  (onChange)="filter($event.value)" placeholder="Any"
+                                                                  [style]="{ 'min-width': '12rem' }">
                                                             <ng-template let-option #item>
-                                                                <span [class]="'customer-badge status-' + option.value">{{ option.label }}</span>
+                                                                <span
+                                                                    [class]="'customer-badge status-' + option.value">{{ option.label }}</span>
                                                             </ng-template>
                                                         </p-select>
                                                     </ng-template>
@@ -231,7 +262,8 @@ interface ExportColumn {
                                             Price
                                             <div>
                                                 <p-sortIcon field="price" />
-                                                <p-columnFilter type="numeric" field="price" display="menu"></p-columnFilter>
+                                                <p-columnFilter type="numeric" field="price"
+                                                                display="menu"></p-columnFilter>
                                             </div>
                                         </div>
                                     </th>
@@ -240,7 +272,8 @@ interface ExportColumn {
                                             Total Area
                                             <div>
                                                 <p-sortIcon field="totalArea" />
-                                                <p-columnFilter type="numeric" field="totalArea" display="menu"></p-columnFilter>
+                                                <p-columnFilter type="numeric" field="totalArea"
+                                                                display="menu"></p-columnFilter>
                                             </div>
                                         </div>
                                     </th>
@@ -249,7 +282,8 @@ interface ExportColumn {
                                             Rooms
                                             <div>
                                                 <p-sortIcon field="rooms" />
-                                                <p-columnFilter type="numeric" field="rooms" display="menu"></p-columnFilter>
+                                                <p-columnFilter type="numeric" field="rooms"
+                                                                display="menu"></p-columnFilter>
                                             </div>
                                         </div>
                                     </th>
@@ -262,7 +296,8 @@ interface ExportColumn {
                                         <p-tableCheckbox [value]="record" />
                                     </td>
                                     <td style="min-width: 16rem">
-                                        <a [routerLink]="['/realty/listing/property/details/', record.id]" p-button variant="text">
+                                        <a [routerLink]="['/realty/listing/property/details/', record.id]" p-button
+                                           variant="text">
                                             {{ record.name }}
                                         </a>
                                     </td>
@@ -273,10 +308,12 @@ interface ExportColumn {
 
                                     <td>
                                         <div class="flex flex-wrap justify-end mr-4">
-                                            <a [routerLink]="['/realty/listing/property/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
+                                            <a [routerLink]="['/realty/listing/property/details/', record.id]" pButton
+                                               class="mr-2" [rounded]="true" [outlined]="true">
                                                 <SearchIcon pButtonIcon />
                                             </a>
-                                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProperty(record)" />
+                                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true"
+                                                      [outlined]="true" (click)="deleteProperty(record)" />
                                         </div>
                                     </td>
                                 </tr>
@@ -287,7 +324,8 @@ interface ExportColumn {
                         <p-fieldset legend="Payment Plan List" [toggleable]="true">
                             <div *ngIf="editPaymentPlan">
                                 <div class="mb-4">
-                                    <p-pick-list [source]="sourcePaymentPlans" [target]="targetPaymentPlans" breakpoint="1400px">
+                                    <p-pick-list [source]="sourcePaymentPlans" [target]="targetPaymentPlans"
+                                                 breakpoint="1400px">
                                         <ng-template #sourceHeader>
                                             <div class="font-bold text-l text-primary">Available</div>
                                         </ng-template>
@@ -300,7 +338,8 @@ interface ExportColumn {
                                     </p-pick-list>
                                 </div>
                                 <div class="text-center">
-                                    <p-button label="Cancel" [text]="true" icon="pi pi-times" (onClick)="cancelEditPaymentPlan()" severity="danger"></p-button>
+                                    <p-button label="Cancel" [text]="true" icon="pi pi-times"
+                                              (onClick)="cancelEditPaymentPlan()" severity="danger"></p-button>
                                     <p-button label="Save" [outlined]="true" (onClick)="savePaymentPlan()"></p-button>
                                 </div>
                             </div>
@@ -312,7 +351,9 @@ interface ExportColumn {
                                                 <div class="flex justify-between items-center">
                                                     <div>List</div>
                                                     <div>
-                                                        <p-button label="Edit" size="small" severity="secondary" icon="pi pi-pencil" (onClick)="editPaymentPlanRecord()"></p-button>
+                                                        <p-button label="Edit" size="small" severity="secondary"
+                                                                  icon="pi pi-pencil"
+                                                                  (onClick)="editPaymentPlanRecord()"></p-button>
                                                     </div>
                                                 </div>
                                             </th>
@@ -321,7 +362,8 @@ interface ExportColumn {
                                     <ng-template #body let-record>
                                         <tr>
                                             <td>
-                                                <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" class="mr-2" pButton text="true">
+                                                <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]"
+                                                   class="mr-2" pButton text="true">
                                                     {{ record.name }}
                                                 </a>
                                             </td>
@@ -336,6 +378,7 @@ interface ExportColumn {
             </p-tabs>
         </div>
 
+        <p-toast />
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
     providers: [CommunityService, ProjectService, ConfirmationService, MessageService, PaymentplanService]
@@ -393,7 +436,7 @@ export class ProjectEdit implements OnInit {
             name: new FormControl(null, { validators: [Validators.required] }),
             description: new FormControl(null),
             communityId: new FormControl(null),
-            community: new FormControl(null)
+            community: new FormControl(null, { validators: [Validators.required] })
         });
     }
 
@@ -461,12 +504,85 @@ export class ProjectEdit implements OnInit {
     saveRecord() {
         this.submitted = true;
         if (this.recordForm.valid) {
-            this.editMode = false;
-            this.submitted = false;
+            if (this.recordId) {
+                this.projectService.putProject(this.recordId, this.recordForm.value).subscribe({
+                    next: () => {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Record Update',
+                            life: 3000
+                        });
+                        this.editMode = false;
+                        this.submitted = false;
+                    },
+                    error: (err) => {
+                        this.editMode = false;
+                        this.recordForm.reset(this.record());
+                        this.submitted = false;
 
-            alert('Form Submitted succesfully!!!\n Check the values in browser console.');
-            console.table(this.recordForm.value);
+                        this.errorMessage();
+                    }
+                });
+            } else {
+                const project: Project = this.recordForm.value;
+                project.communityId = project.community?.id;
+                this.projectService.postProject(this.recordForm.value).subscribe({
+                    next: () => {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Record Created',
+                            life: 3000
+                        });
+                        this.editMode = false;
+                        this.submitted = false;
+                    },
+                    error: (err) => {
+                        this.errorMessage();
+                    }
+                });
+            }
+        } else {
+            this.markAllAsTouched(this.recordForm);
         }
+    }
+
+    updateValidity(formGroup: FormGroup) {
+        Object.keys(formGroup.controls).forEach((field) => {
+            const control = formGroup.get(field);
+            if (control instanceof FormControl || control instanceof FormArray) {
+                control.updateValueAndValidity();
+            } else if (control instanceof FormGroup) {
+                this.updateValidity(control); // Recursive call for nested FormGroup
+            }
+        });
+    }
+
+    markAllAsTouched(formGroup: FormGroup) {
+        Object.keys(formGroup.controls).forEach((field) => {
+            const control = formGroup.get(field);
+            if (control instanceof FormControl) {
+                control.markAsTouched({ onlySelf: true });
+            } else if (control instanceof FormGroup) {
+                this.markAllAsTouched(control); // Recursive call for nested FormGroup
+            } else if (control instanceof FormArray) {
+                control.controls.forEach((ctrl) => {
+                    if (ctrl instanceof FormGroup) {
+                        this.markAllAsTouched(ctrl);
+                    }
+                });
+            }
+        });
+    }
+
+    errorMessage() {
+        this.messageService.add({
+            severity: 'danger',
+            summary: 'Error',
+            detail: 'Unsuccessful',
+            life: 3000
+        });
     }
 
     editPaymentPlanRecord() {
