@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Project } from './project.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 export interface Community {
     id?: string | null;
@@ -20,12 +20,8 @@ export class CommunityService {
     private apiUrl = '/api/communities';
     private communities: Community[] = [];
 
-    getCommunities() {
-        return this.http.get<Community[]>(this.apiUrl);
-    }
-
-    getCommunitiesByName(name: string) {
-        return this.http.get<Community[]>(`${this.apiUrl}?name_like=${name}`);
+    getCommunities(params: HttpParams) {
+        return this.http.get<Community[]>(this.apiUrl, { params, observe: 'response' });
     }
 
     postCommunity(community: Community) {

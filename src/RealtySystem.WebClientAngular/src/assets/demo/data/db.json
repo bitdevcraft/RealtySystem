@@ -388,19 +388,6 @@
       "name": "Blue Horizon Boardwalk & Dining",
       "description": "A beachfront boardwalk with restaurants and shops.",
       "communityId": "20"
-    },
-    {
-      "id": "48Ijguz",
-      "name": "Danube 1",
-      "description": "Test Demo",
-      "communityId": "1",
-      "community": {
-        "id": "1",
-        "name": "Palm Grove Estates",
-        "description": "A gated community with luxury homes and green spaces. Edited",
-        "city": "Miami",
-        "country": "United States"
-      }
     }
   ],
   "properties": [
@@ -429,6 +416,10 @@
         }
       },
       "listing": "Rental",
+      "unitNo": null,
+      "plotNo": null,
+      "villaNo": null,
+      "buildingNo": null,
       "address": {
         "street": "101 Project 1 St.",
         "city": "CityName",

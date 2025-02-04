@@ -24,7 +24,6 @@ export class ProjectService {
     private apiUrlCommunities = '/api/communities';
 
     getProjects(params: HttpParams) {
-        console.log(params);
         return this.http.get<Project[]>(`${this.apiUrl}`, { params, observe: 'response' });
     }
 

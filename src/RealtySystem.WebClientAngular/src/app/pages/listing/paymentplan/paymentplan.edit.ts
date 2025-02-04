@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ToolbarModule } from 'primeng/toolbar';
-import { Milestone, MilestoneFee, PaymentPlan, SchedulePlan, PaymentplanService } from '../../service/paymentplan.service';
+import { Milestone, MilestoneFee, PaymentPlan, SchedulePlan, PaymentplanService } from '../../service/listing/paymentplan.service';
 import { ButtonDirective, ButtonModule } from 'primeng/button';
 import { CommonModule, Location, NgIf } from '@angular/common';
 import { RatingModule } from 'primeng/rating';

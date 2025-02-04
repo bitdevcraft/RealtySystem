@@ -2,10 +2,10 @@ import { Component, signal, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DataViewModule } from 'primeng/dataview';
-import { Property, PropertyService } from '../../service/property.service';
+import { DataViewModule, DataViewPageEvent } from 'primeng/dataview';
+import { Property, PropertyService } from '../../service/listing/property.service';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { DecimalPipe, NgClass, NgForOf, NgIf } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, NgStyle } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 import { Select } from 'primeng/select';
@@ -13,18 +13,21 @@ import { MultiSelectChangeEvent, MultiSelectModule } from 'primeng/multiselect';
 import { ComparisonOperator, FilterCriterion, MatchType } from '../../service/generic.service';
 import { FluidModule } from 'primeng/fluid';
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteSelectEvent } from 'primeng/autocomplete';
-import { ProjectService } from '../../service/project.service';
-import { CommunityService } from '../../service/community.service';
+import { ProjectService } from '../../service/listing/project.service';
+import { CommunityService } from '../../service/listing/community.service';
 import { Popover } from 'primeng/popover';
 import { TableModule } from 'primeng/table';
 import { InputNumber } from 'primeng/inputnumber';
 import { Chip } from 'primeng/chip';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
-import { Fee, PaymentPlan, PaymentplanService, SchedulePlan } from '../../service/paymentplan.service';
+import { Fee, PaymentPlan, PaymentplanService, SchedulePlan } from '../../service/listing/paymentplan.service';
 import { OptionService } from '../../service/option.service';
 import { TabsModule } from 'primeng/tabs';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { HttpParams } from '@angular/common/http';
+import { Skeleton } from 'primeng/skeleton';
+import { FieldsetModule } from 'primeng/fieldset';
 
 @Component({
     selector: 'booking-new',
@@ -52,7 +55,10 @@ import { ScrollTopModule } from 'primeng/scrolltop';
         Dialog,
         TabsModule,
         NgIf,
-        ScrollTopModule
+        ScrollTopModule,
+        Skeleton,
+        NgStyle,
+        FieldsetModule
     ],
     styles: `
         :host {
@@ -131,7 +137,7 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 
                 <ng-template #list let-items>
                     <div class="mt-6">
-                        <p-table [value]="items">
+                        <p-table [value]="items" [lazy]="true">
                             <ng-template #header>
                                 <tr>
                                     <th style="min-width: 12rem">Name</th>
@@ -165,6 +171,28 @@ import { ScrollTopModule } from 'primeng/scrolltop';
                                     </td>
                                 </tr>
                             </ng-template>
+                            <ng-template #loadingbody>
+                                <tr style="height:46px">
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                    <td>
+                                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                                    </td>
+                                </tr>
+                            </ng-template>
                         </p-table>
                     </div>
                 </ng-template>
@@ -176,16 +204,16 @@ import { ScrollTopModule } from 'primeng/scrolltop';
                                 <div class="pt-12">
                                     <div class="flex flex-row justify-between items-start gap-2">
                                         <div>
-                                            <div class="text-lg font-medium">{{ item.name }}</div>
+                                            <div class="text-lg font-medium">{{ item?.name }}</div>
                                             <div class="font-medium text-surface-500 dark:text-surface-400 text-sm">
-                                                {{ item.project?.name | prefixSuffix: 'by' }}
+                                                {{ item?.project?.name | prefixSuffix: 'by' }}
                                                 &nbsp;
                                             </div>
                                         </div>
-                                        <span class="font-medium text-surface-500 dark:text-surface-400 text-sm mt-1">{{ item.type }} {{ item.rooms | prefixSuffix: '|' : 'Room' }}</span>
+                                        <span class="font-medium text-surface-500 dark:text-surface-400 text-sm mt-1">{{ item?.type }} {{ item?.rooms | prefixSuffix: '|' : 'Room' }}</span>
                                     </div>
                                     <div class="flex flex-col gap-6 mt-6">
-                                        <span class="text-2xl font-semibold">{{ item.price | number: '1.0-0' | prefixSuffix: 'AED' : '' }}</span>
+                                        <span class="text-2xl font-semibold">{{ item?.price | number: '1.0-0' | prefixSuffix: 'AED' : '' }}</span>
                                         <div class="flex gap-2">
                                             <p-button icon="pi pi-book" label="Book Now" class="flex-auto whitespace-nowrap" styleClass="w-full"></p-button>
                                             <p-button icon="pi pi-search" styleClass="h-full" [outlined]="true" (onClick)="onOpenPropertyInfo(item)"></p-button>
@@ -204,13 +232,134 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 
         <p-dialog [(visible)]="propertyInfoDialog" [style]="{ width: '80rem', height: '75vh' }" header="Property Info" [modal]="true" [maximizable]="true" [breakpoints]="{ '1199px': '90vw', '575px': '90vw' }" (onHide)="onHidePropertyInfo()">
             <div>
-                <p-tabs [value]="0">
+                <p-tabs [value]="dialogTabValue">
                     <p-tablist>
                         <p-tab [value]="0">Info</p-tab>
                         <p-tab [value]="1">Sales Offer</p-tab>
                     </p-tablist>
                     <p-tabpanels>
-                        <p-tabpanel [value]="0"></p-tabpanel>
+                        <p-tabpanel [value]="0">
+                            <div class="mb-6">
+                                <p-fieldset legend="Details">
+                                    <div class="flex  flex-col  gap-6">
+                                        <div class="flex  flex-col md:flex-row gap-6 w-full">
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="name">Name</label>
+                                                <div id="name" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="project">Project</label>
+                                                <div id="project" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.project?.name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-4 w-full">
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="description">Description</label>
+                                                <div id="description" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.description }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-4 w-full">
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="unitNo">Unit No</label>
+                                                <div id="unitNo" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.unitNo }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="villaNo">Villa No</label>
+                                                <div id="villaNo" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.villaNo }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="buildingNo">Building No</label>
+                                                <div id="buildingNo" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.buildingNo }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="plotNo">Plot No</label>
+                                                <div id="plotNo" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.plotNo }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-fieldset>
+                            </div>
+                            <div class="mb-6">
+                                <p-fieldset legend="Size and Price">
+                                    <div class="flex  flex-col  gap-6">
+                                        <div class="flex  flex-col md:flex-row gap-6 w-full">
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="price">Sale Price</label>
+                                                <div id="price" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.price | prefixSuffix: 'AED' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <label for="totalArea">Total Area</label>
+                                                <div id="totalArea" class=" border-b h-8 w-full pl-2.5 pr-2.5 flex justify-between items-center p-1">
+                                                    <div>
+                                                        {{ selectProperty?.totalArea | prefixSuffix: '' : 'ft&sup2;' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-fieldset>
+                            </div>
+                            <div class="mb-6">
+                                <p-fieldset legend="Features">
+                                    <div class="flex  flex-col  gap-6">
+                                        <div class="flex  flex-col md:flex-row gap-6 w-full">
+                                            <div class="flex flex-col gap-4 w-full">
+                                                <p-table [value]="selectProperty?.features ?? []" [scrollable]="true">
+                                                    <ng-template #header>
+                                                        <tr>
+                                                            <th>
+                                                                <div class="w-full flex justify-between items-center parent-container">Title</div>
+                                                            </th>
+                                                            <th>
+                                                                <div class="w-full flex justify-between items-center parent-container">Description</div>
+                                                            </th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template #body let-feature>
+                                                        <tr>
+                                                            <td>{{ feature.name }}</td>
+                                                            <td>{{ feature.description }}</td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-fieldset>
+                            </div>
+                        </p-tabpanel>
                         <p-tabpanel [value]="1">
                             <div class="mb-6">
                                 <p-autoComplete
@@ -295,6 +444,8 @@ export class BookingNew {
 
     records = signal<Property[]>([]);
 
+    params: HttpParams = new HttpParams();
+
     types: any[] = [];
 
     sortOption: any[] = [];
@@ -318,6 +469,8 @@ export class BookingNew {
     filterCriteria: FilterCriterion<Property>[] = [];
 
     propertyInfoDialog: boolean = false;
+
+    dialogTabValue: number = 0;
 
     selectedPaymentPlan: PaymentPlan | null = null;
 
@@ -364,9 +517,30 @@ export class BookingNew {
     }
 
     loadData(): void {
-        this.propertyService.getPropertiesWithProject().subscribe({
-            next: (data: any) => {
-                this.records.set(data);
+        this.params = this.params.set('_expand', 'project');
+        // this.params = this.params.set('_page', 1);
+        // this.params = this.params.set('_limit', 12);
+        this.params = this.params.set('status', 'Available');
+
+        this.propertyService.getProperties(this.params).subscribe({
+            next: (response) => {
+                this.records.set(response.body ?? []);
+            }
+        });
+    }
+
+    onPageUpdate(event: DataViewPageEvent) {
+        const page = (event.first || 0) / (event.rows || 12) + 1;
+
+        this.params = this.params.set('_expand', 'project');
+        this.params = this.params.set('_page', page);
+        this.params = this.params.set('_limit', event.rows);
+
+        this.propertyService.getProperties(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+                Array.prototype.splice.apply(array, [event.first ?? 0, event.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
             }
         });
     }
@@ -410,18 +584,22 @@ export class BookingNew {
 
     filterCommunity(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.communityService.getCommunitiesByName(query).subscribe({
+
+        let params = new HttpParams();
+        params = params.set('name_like', query);
+        this.communityService.getCommunities(params).subscribe({
             next: (data) => {
-                this.autoFilteredValue = data;
+                this.autoFilteredValue = data.body ?? [];
             }
         });
     }
 
     filterPaymentPlan(event: AutoCompleteCompleteEvent) {
         const query = event.query;
-        this.paymentPlanService.getPaymentPlans().subscribe({
+        let params = new HttpParams();
+        this.paymentPlanService.getPaymentPlans(params).subscribe({
             next: (data) => {
-                this.autoFilteredValue = data;
+                this.autoFilteredValue = data.body ?? [];
             }
         });
     }
@@ -539,6 +717,7 @@ export class BookingNew {
     onOpenPropertyInfo(property: Property) {
         this.propertyInfoDialog = true;
         this.selectProperty = property;
+        this.dialogTabValue = 0;
     }
 
     onHidePropertyInfo() {
@@ -547,6 +726,7 @@ export class BookingNew {
         this.selectProperty = null;
         this.selectedSchedulePlan.set([]);
         this.selectedFees.set([]);
+        this.dialogTabValue = 0;
     }
 
     onPaymentPlanSelected(event: AutoCompleteSelectEvent) {

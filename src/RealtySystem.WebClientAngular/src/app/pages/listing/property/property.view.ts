@@ -8,7 +8,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
-import { Project, ProjectService } from '../../service/project.service';
+import { Project, ProjectService } from '../../service/listing/project.service';
 import { TextareaModule } from 'primeng/textarea';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -20,13 +20,15 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CountryService } from '../../service/country.service';
-import { CommunityService } from '../../service/community.service';
+import { CommunityService } from '../../service/listing/community.service';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { Property, PropertyService } from '../../service/property.service';
+import { Property, PropertyService } from '../../service/listing/property.service';
 import { RouterModule } from '@angular/router';
 import { PencilIcon, PlusIcon, SearchIcon, WindowMaximizeIcon } from 'primeng/icons';
 import { PrefixSuffixPipe } from '../../../utils/pipe/prefixsuffix.pipe';
 import { OptionService } from '../../service/option.service';
+import { HttpParams } from '@angular/common/http';
+import { Skeleton } from 'primeng/skeleton';
 
 interface Column {
     field: string;
@@ -63,7 +65,8 @@ interface ExportColumn {
         RouterModule,
         PlusIcon,
         SearchIcon,
-        PrefixSuffixPipe
+        PrefixSuffixPipe,
+        Skeleton
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -81,17 +84,18 @@ interface ExportColumn {
 
         <p-table
             #dt
+            dataKey="id"
             [value]="records()"
-            [rows]="10"
-            [paginator]="true"
             [globalFilterFields]="['name', 'description', 'project.name']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [(selection)]="selectedRecords"
             [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
-            [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
+            [paginator]="true"
+            (onPage)="onPageUpdate($event)"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (sortFunction)="onSortChange($event)"
+            [customSort]="true"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -200,6 +204,34 @@ interface ExportColumn {
                     </td>
                 </tr>
             </ng-template>
+            <ng-template #loadingbody>
+                <tr style="height:46px">
+                    <td style="width: 3rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td style="min-width: 16rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                </tr>
+            </ng-template>
         </p-table>
 
         <p-toast />
@@ -213,6 +245,8 @@ export class PropertyView implements OnInit {
     record!: Property;
 
     selectedRecords!: Property[] | null;
+
+    params: HttpParams = new HttpParams();
 
     @ViewChild('dt') dt!: Table;
 
@@ -243,9 +277,46 @@ export class PropertyView implements OnInit {
     }
 
     loadData() {
-        this.propertyService.getPropertiesWithProject().subscribe({
-            next: (data) => {
-                this.records.set(data);
+        this.params = this.params.set('_expand', 'project');
+        this.params = this.params.set('_page', 1);
+        this.params = this.params.set('_limit', 10);
+
+        this.propertyService.getProperties(this.params).subscribe({
+            next: (response) => {
+                const length = parseInt(response.headers.get('x-total-count') ?? '0');
+                const array: Property[] = Array.from({ length: length });
+                Array.prototype.splice.apply(array, [0, 10, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
+        });
+    }
+
+    onPageUpdate(event: any) {
+        const page = (event.first || 0) / (event.rows || 10) + 1;
+
+        this.params = this.params.set('_expand', 'project');
+        this.params = this.params.set('_page', page);
+        this.params = this.params.set('_limit', event.rows);
+
+        this.propertyService.getProperties(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+                Array.prototype.splice.apply(array, [event.first ?? 0, event.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
+        });
+    }
+
+    onSortChange(event: any) {
+        this.params = this.params.set('_sort', event.field);
+        this.params = this.params.set('_order', event.order === 1 ? 'asc' : 'desc');
+        this.params = this.params.set('_page', 1);
+
+        this.propertyService.getProperties(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+                Array.prototype.splice.apply(array, [0, this.dt.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
             }
         });
     }

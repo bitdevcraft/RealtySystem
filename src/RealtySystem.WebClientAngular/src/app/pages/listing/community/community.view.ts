@@ -8,7 +8,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
-import { Community, CommunityService } from '../../service/community.service';
+import { Community, CommunityService } from '../../service/listing/community.service';
 import { TextareaModule } from 'primeng/textarea';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -21,6 +21,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CountryService } from '../../service/country.service';
 import { Country } from '../../service/customer.service';
+import { HttpParams } from '@angular/common/http';
+import { Project } from '../../service/listing/project.service';
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
     selector: 'community-view',
@@ -42,7 +45,8 @@ import { Country } from '../../service/customer.service';
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        Skeleton
     ],
     template: `
         <p-toolbar styleClass="mb-6">
@@ -58,17 +62,18 @@ import { Country } from '../../service/customer.service';
 
         <p-table
             #dt
+            dataKey="id"
             [value]="records()"
-            [rows]="10"
-            [paginator]="true"
             [globalFilterFields]="['name', 'description', 'city', 'country']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [(selection)]="selectedRecords"
             [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
-            [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
+            [paginator]="true"
+            (onPage)="onPageUpdate($event)"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (sortFunction)="onSortChange($event)"
+            [customSort]="true"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -140,36 +145,29 @@ import { Country } from '../../service/customer.service';
                     </td>
                 </tr>
             </ng-template>
+            <ng-template #loadingbody>
+                <tr style="height:46px">
+                    <td style="width: 3rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td style="min-width: 16rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                </tr>
+            </ng-template>
         </p-table>
-
-        <p-dialog [(visible)]="recordDialog" [style]="{ width: '450px' }" header="Community Details" [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <div>
-                        <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
-                    </div>
-                    <div>
-                        <label for="country" class="block font-bold mb-3">Country</label>
-                        <p-select [(ngModel)]="record.country" inputId="country" [options]="countryList" [filter]="true" filterBy="name" [showClear]="true" appendTo="body" optionLabel="name" optionValue="name" placeholder="Select a Country" fluid />
-                    </div>
-                    <div>
-                        <label for="city" class="block font-bold mb-3">City</label>
-                        <input type="text" pInputText id="city" [(ngModel)]="record.city" autofocus fluid />
-                    </div>
-                    <div>
-                        <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3" cols="20" fluid></textarea>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()" />
-            </ng-template>
-        </p-dialog>
 
         <p-confirmdialog [style]="{ width: '450px' }"></p-confirmdialog>
         <p-toast />
@@ -182,6 +180,8 @@ export class CommunityView implements OnInit {
     records = signal<Community[]>([]);
 
     record!: Community;
+
+    params: HttpParams = new HttpParams();
 
     selectedRecords!: Community[] | null;
 
@@ -214,11 +214,47 @@ export class CommunityView implements OnInit {
     }
 
     loadData() {
-        this.communityService.getCommunities().subscribe({
-            next: (data) => {
-                this.records.set(data);
+        this.params = this.params.set('_page', 1);
+        this.params = this.params.set('_limit', 10);
+        this.communityService.getCommunities(this.params).subscribe({
+            next: (response) => {
+                const length = parseInt(response.headers.get('x-total-count') ?? '0');
+                const array: Community[] = Array.from({ length: length });
+                Array.prototype.splice.apply(array, [0, 10, ...(response.body ?? [])]);
+                this.records.set(array);
             },
             error: (err) => console.log(err)
+        });
+    }
+
+    onPageUpdate(event: any) {
+        const page = (event.first || 0) / (event.rows || 10) + 1;
+
+        this.params = this.params.set('_page', page);
+        this.params = this.params.set('_limit', event.rows);
+
+        this.communityService.getCommunities(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+                Array.prototype.splice.apply(array, [event.first ?? 0, event.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
+        });
+    }
+
+    onSortChange(event: any) {
+
+        this.params = this.params.set('_sort', event.field);
+        this.params = this.params.set('_order', event.order === 1 ? 'asc' : 'desc');
+        this.params = this.params.set('_page', 1);
+
+        this.communityService.getCommunities(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+
+                Array.prototype.splice.apply(array, [this.dt.first ?? 0, this.dt.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
         });
     }
 

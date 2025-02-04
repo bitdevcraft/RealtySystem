@@ -3,7 +3,7 @@ import { Button, ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button
 import { PlusIcon } from 'primeng/icons';
 import { RouterLink } from '@angular/router';
 import { Toolbar } from 'primeng/toolbar';
-import { Booking, BookingService } from '../../service/booking.service';
+import { Booking, BookingService } from '../../service/booking/booking.service';
 import { Table, TableModule } from 'primeng/table';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';

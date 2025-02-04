@@ -19,11 +19,13 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CountryService } from '../../service/country.service';
-import { CommunityService } from '../../service/community.service';
+import { Community, CommunityService } from '../../service/listing/community.service';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { PaymentPlan, PaymentplanService } from '../../service/paymentplan.service';
+import { PaymentPlan, PaymentplanService } from '../../service/listing/paymentplan.service';
 import { PencilIcon, PlusIcon, SearchIcon } from 'primeng/icons';
 import { RouterLink } from '@angular/router';
+import { HttpParams } from '@angular/common/http';
+import { Skeleton } from 'primeng/skeleton';
 
 interface Column {
     field: string;
@@ -59,38 +61,41 @@ interface ExportColumn {
         ConfirmDialogModule,
         PlusIcon,
         RouterLink,
-        SearchIcon
+        SearchIcon,
+        Skeleton
     ],
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
-                <!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()"/>-->
                 <a routerLink="/realty/listing/payment-plan/add" pButton class="mr-2" severity="secondary">
                     <PlusIcon pButtonIcon />
                     <span pButtonLabel>New</span>
                 </a>
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedRecords()" [disabled]="!selectedRecords || !selectedRecords.length" />
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
+                          (onClick)="deleteSelectedRecords()"
+                          [disabled]="!selectedRecords || !selectedRecords.length" />
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true" />
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"
+                          [disabled]="true" />
             </ng-template>
         </p-toolbar>
 
         <p-table
             #dt
+            dataKey="id"
             [value]="records()"
-            [rows]="10"
-            [columns]="cols"
-            [paginator]="true"
             [globalFilterFields]="['name', 'description', 'community.name']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [(selection)]="selectedRecords"
             [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
-            [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
+            [paginator]="true"
+            (onPage)="onPageUpdate($event)"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (sortFunction)="onSortChange($event)"
+            [customSort]="true"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -98,9 +103,11 @@ interface ExportColumn {
                     <div class="flex gap-2">
                         <p-iconfield>
                             <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
+                                   placeholder="Search..." />
                         </p-iconfield>
-                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
+                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
+                                  class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                     </div>
                 </div>
             </ng-template>
@@ -114,14 +121,16 @@ interface ExportColumn {
                             Name
                             <div>
                                 <p-sortIcon field="name" />
-                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
+                                <p-columnFilter type="text" field="name" display="menu"
+                                                placeholder="Search by name"></p-columnFilter>
                             </div>
                         </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
                             Description
-                            <p-columnFilter type="text" field="description" display="menu" placeholder="Search by description"></p-columnFilter>
+                            <p-columnFilter type="text" field="description" display="menu"
+                                            placeholder="Search by description"></p-columnFilter>
                         </div>
                     </th>
                     <th style="min-width: 12rem"></th>
@@ -136,38 +145,33 @@ interface ExportColumn {
                     <td>{{ record.description }}</td>
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
-                            <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
+                            <a [routerLink]="['/realty/listing/payment-plan/details/', record.id]" pButton class="mr-2"
+                               [rounded]="true" [outlined]="true">
                                 <SearchIcon pButtonIcon />
                             </a>
-                            <!--                            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"-->
-                            <!--                                      (click)="editRecord(record)"/>-->
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteRecord(record)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                                      (click)="deleteRecord(record)" />
                         </div>
                     </td>
                 </tr>
             </ng-template>
+            <ng-template #loadingbody>
+                <tr style="height:46px">
+                    <td style="width: 3rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td style="min-width: 12rem">
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                    <td>
+                        <p-skeleton [ngStyle]="{ width: '60%' }" />
+                    </td>
+                </tr>
+            </ng-template>
         </p-table>
-
-        <p-dialog [(visible)]="recordDialog" [style]="{ width: '450px' }" header="Payment Plan Details" [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <div>
-                        <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="record.name" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !record.name">Name is required.</small>
-                    </div>
-                    <div>
-                        <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="record.description" required rows="3" cols="20" fluid></textarea>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveRecord()" />
-            </ng-template>
-        </p-dialog>
 
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
@@ -183,6 +187,8 @@ export class PaymentplanView implements OnInit {
     selectedRecords!: PaymentPlan[] | null;
 
     submitted: boolean = false;
+
+    params: HttpParams = new HttpParams();
 
     @ViewChild('dt') dt!: Table;
 
@@ -210,10 +216,16 @@ export class PaymentplanView implements OnInit {
     }
 
     loadData() {
-        this.paymentplanService.getPaymentPlans().subscribe({
-            next: (data) => {
-                this.records.set(data);
-            }
+        this.params = this.params.set('_page', 1);
+        this.params = this.params.set('_limit', 10);
+        this.paymentplanService.getPaymentPlans(this.params).subscribe({
+            next: (response) => {
+                const length = parseInt(response.headers.get('x-total-count') ?? '0');
+                const array: PaymentPlan[] = Array.from({ length: length });
+                Array.prototype.splice.apply(array, [0, 10, ...(response.body ?? [])]);
+                this.records.set(array);
+            },
+            error: (err) => console.log(err)
         });
 
         this.cols = [
@@ -227,19 +239,38 @@ export class PaymentplanView implements OnInit {
         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
+    onPageUpdate(event: any) {
+        const page = (event.first || 0) / (event.rows || 10) + 1;
+
+        this.params = this.params.set('_page', page);
+        this.params = this.params.set('_limit', event.rows);
+
+        this.paymentplanService.getPaymentPlans(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+                Array.prototype.splice.apply(array, [event.first ?? 0, event.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
+        });
+    }
+
+    onSortChange(event: any) {
+        this.params = this.params.set('_sort', event.field);
+        this.params = this.params.set('_order', event.order === 1 ? 'asc' : 'desc');
+        this.params = this.params.set('_page', 1);
+
+        this.paymentplanService.getPaymentPlans(this.params).subscribe({
+            next: (response) => {
+                const array = this.records();
+
+                Array.prototype.splice.apply(array, [this.dt.first ?? 0, this.dt.rows ?? 0, ...(response.body ?? [])]);
+                this.records.set(array);
+            }
+        });
+    }
+
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-    }
-
-    openNew() {
-        this.record = {};
-        this.submitted = false;
-        this.recordDialog = true;
-    }
-
-    editRecord(record: PaymentPlan) {
-        this.record = { ...record };
-        this.recordDialog = true;
     }
 
     deleteSelectedRecords() {
@@ -336,14 +367,5 @@ export class PaymentplanView implements OnInit {
     clear(table: Table) {
         table.clear();
         if (this.filter) this.filter.nativeElement.value = '';
-    }
-
-    filterCommunity(event: AutoCompleteCompleteEvent) {
-        const query = event.query;
-        this.communityService.getCommunitiesByName(query).subscribe({
-            next: (data) => {
-                this.autoFilteredValue = data;
-            }
-        });
     }
 }

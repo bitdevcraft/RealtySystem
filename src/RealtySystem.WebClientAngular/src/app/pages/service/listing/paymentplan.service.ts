@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -278,8 +278,8 @@ export class PaymentplanService {
 
     constructor(private http: HttpClient) {}
 
-    getPaymentPlans() {
-        return this.http.get<PaymentPlan[]>(this.apiUrl);
+    getPaymentPlans(params: HttpParams) {
+        return this.http.get<PaymentPlan[]>(this.apiUrl, { params, observe: 'response' });
     }
 
     getPaymentPlan(id: string) {

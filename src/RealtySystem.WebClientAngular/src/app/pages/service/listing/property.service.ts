@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Project } from './project.service';
-import { Address } from './interface/address';
-import { IForm, ToFormControls } from './type/IForm';
-import { FilterCriterion, GenericService, MatchType } from './generic.service';
-import { HttpClient } from '@angular/common/http';
+import { Address } from '../interface/address';
+import { IForm, ToFormControls } from '../type/IForm';
+import { FilterCriterion, GenericService, MatchType } from '../generic.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
 import { Community } from './community.service';
 import { map } from 'rxjs/operators';
@@ -48,8 +48,8 @@ export class PropertyService {
 
     constructor(private http: HttpClient) {}
 
-    getProperties() {
-        return this.http.get<Property[]>(this.apiUrl);
+    getProperties(params: HttpParams) {
+        return this.http.get<Property[]>(this.apiUrl, { params, observe: 'response' });
     }
 
     getPropertiesWithProject(): Observable<Property[]> {

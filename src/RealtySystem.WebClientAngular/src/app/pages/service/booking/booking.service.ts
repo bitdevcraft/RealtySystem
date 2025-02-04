@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { Property } from './property.service';
-import { SchedulePlan } from './paymentplan.service';
+import { Property } from '../listing/property.service';
+import { SchedulePlan } from '../listing/paymentplan.service';
 import { Subject } from 'rxjs';
 
 export interface BookingFee {
@@ -16,8 +16,6 @@ export interface Booking {
     property?: Property | null;
     // account
     accountId?: string | null;
-    // mainBuyer
-    mainBuyerId?: string | null;
     coBuyers?: [] | null;
 
     bookingDate?: Date | null;

@@ -9,7 +9,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
-import { Project, ProjectService } from '../../service/project.service';
+import { Project, ProjectService } from '../../service/listing/project.service';
 import { TextareaModule } from 'primeng/textarea';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -21,7 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CountryService } from '../../service/country.service';
-import { CommunityService } from '../../service/community.service';
+import { CommunityService } from '../../service/listing/community.service';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { RouterModule } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -69,14 +69,11 @@ interface Column {
                     <PlusIcon pButtonIcon />
                     <span pButtonLabel>New</span>
                 </a>
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined
-                          (onClick)="deleteSelectedRecords()"
-                          [disabled]="!selectedRecords || !selectedRecords.length" />
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedRecords()" [disabled]="!selectedRecords || !selectedRecords.length" />
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()"
-                          [disabled]="true" />
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" [disabled]="true" />
             </ng-template>
         </p-toolbar>
 
@@ -101,11 +98,9 @@ interface Column {
                     <div class="flex gap-2">
                         <p-iconfield>
                             <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)"
-                                   placeholder="Search..." />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
                         </p-iconfield>
-                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary"
-                                  class="p-button-outlined mb-2" (onClick)="clear(dt)" />
+                        <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" class="p-button-outlined mb-2" (onClick)="clear(dt)" />
                     </div>
                 </div>
             </ng-template>
@@ -119,16 +114,14 @@ interface Column {
                             Name
                             <div>
                                 <p-sortIcon field="name" />
-                                <p-columnFilter type="text" field="name" display="menu"
-                                                placeholder="Search by name"></p-columnFilter>
+                                <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
                             </div>
                         </div>
                     </th>
                     <th style="min-width: 8rem">
                         <div class="flex justify-between items-center">
                             Description
-                            <p-columnFilter type="text" field="description" display="menu"
-                                            placeholder="Search by description"></p-columnFilter>
+                            <p-columnFilter type="text" field="description" display="menu" placeholder="Search by description"></p-columnFilter>
                         </div>
                     </th>
                     <th pSortableColumn="community.name" style="min-width: 12rem">
@@ -136,8 +129,7 @@ interface Column {
                             Community Name
                             <div>
                                 <p-sortIcon field="community.name" />
-                                <p-columnFilter type="text" field="community.name" display="menu"
-                                                placeholder="Search by community"></p-columnFilter>
+                                <p-columnFilter type="text" field="community.name" display="menu" placeholder="Search by community"></p-columnFilter>
                             </div>
                         </div>
                     </th>
@@ -154,12 +146,10 @@ interface Column {
                     <td>{{ record.community?.name }}</td>
                     <td>
                         <div class="flex flex-wrap justify-end mr-4">
-                            <a [routerLink]="['/realty/listing/project/details/', record.id]" pButton class="mr-2"
-                               [rounded]="true" [outlined]="true">
+                            <a [routerLink]="['/realty/listing/project/details/', record.id]" pButton class="mr-2" [rounded]="true" [outlined]="true">
                                 <SearchIcon pButtonIcon />
                             </a>
-                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                                      (click)="deleteRecord(record)" />
+                            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteRecord(record)" />
                         </div>
                     </td>
                 </tr>
@@ -260,10 +250,9 @@ export class ProjectView implements OnInit {
     }
 
     onSortChange(event: any) {
-        console.log('onSortChange', event);
-
         this.params = this.params.set('_sort', event.field);
         this.params = this.params.set('_order', event.order === 1 ? 'asc' : 'desc');
+        this.params = this.params.set('_page', 1);
 
         this.projectService.getProjects(this.params).subscribe({
             next: (response) => {
@@ -400,15 +389,6 @@ export class ProjectView implements OnInit {
     clear(table: Table) {
         table.clear();
         if (this.filter) this.filter.nativeElement.value = '';
-    }
-
-    filterCommunity(event: AutoCompleteCompleteEvent) {
-        const query = event.query;
-        this.communityService.getCommunitiesByName(query).subscribe({
-            next: (data) => {
-                this.autoFilteredValue = data;
-            }
-        });
     }
 
     errorMessage() {
